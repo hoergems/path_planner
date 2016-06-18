@@ -106,7 +106,8 @@ bool MotionValidator::collidesDiscrete(const std::vector<double> &state) const{
 	
 	std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects;
 	robot_environment_->getRobot()->createRobotCollisionObjects(state_vec, collision_objects);
-	std::vector<std::shared_ptr<shared::Obstacle>> obstacles(robot_environment_->getObstacles());
+	std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
+	robot_environment_->getObstacles(obstacles);
 	for (size_t i = 0; i < obstacles.size(); i++) {
 	    if (!obstacles[i]->getTerrain()->isTraversable()) {        	
 	        if (obstacles[i]->in_collision(collision_objects)) {        		
@@ -125,7 +126,8 @@ bool MotionValidator::collidesContinuous(const std::vector<double> &state1,
 	robot_environment_->getRobot()->createRobotCollisionObjects(state1, collision_objects_start);
 	std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_goal;
     robot_environment_->getRobot()->createRobotCollisionObjects(state2, collision_objects_goal);
-    std::vector<std::shared_ptr<shared::Obstacle>> obstacles(robot_environment_->getObstacles());
+    std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
+    robot_environment_->getObstacles(obstacles);
 	for (size_t i = 0; i < obstacles.size(); i++) {
 	    if (!obstacles[i]->isTraversable()) {
 	        for (size_t j = 0; j < collision_objects_start.size(); j++) {                	
