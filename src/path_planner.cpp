@@ -381,10 +381,10 @@ boost::shared_ptr<shared::GoalRegion> makeManipulatorGoalRegion(const ompl::base
 		                                                        std::shared_ptr<shared::RobotEnvironment> &robot_environment,
 		                                                        std::vector<std::vector<double>> goal_states,
 		                                                        std::vector<double> ee_goal_position,
-		                                                        double ee_goal_threshold,
-		                                                        bool dynamics) {
+		                                                        double ee_goal_threshold) {
+		                                                        
 	boost::shared_ptr<shared::GoalRegion> manip_goal_region = 
-			boost::make_shared<ManipulatorGoalRegion>(si, robot_environment, goal_states, ee_goal_position, ee_goal_threshold, dynamics);
+			boost::make_shared<ManipulatorGoalRegion>(si, robot_environment, goal_states, ee_goal_position, ee_goal_threshold);
 	return manip_goal_region;
 }
 
@@ -422,8 +422,8 @@ BOOST_PYTHON_MODULE(libpath_planner) {
     		     std::shared_ptr<shared::RobotEnvironment>&,
     		     std::vector<std::vector<double>> &,                                            
     		     std::vector<double> &,
-    		     double &,
-                 bool>())                            						
+    		     double &>())
+                                             						
     ;
     
     def("makeManipulatorGoalRegion", &makeManipulatorGoalRegion);

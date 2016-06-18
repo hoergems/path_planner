@@ -16,8 +16,8 @@ namespace shared {
             		              std::shared_ptr<shared::RobotEnvironment> &robot_environment,
                                   std::vector<std::vector<double>> &goal_states,
                                   std::vector<double> &ee_goal_position,
-                                  double &ee_goal_threshold,                                  
-                                  bool dynamics);
+                                  double &ee_goal_threshold);                                
+                                  
                                   
             //~ManipulatorGoalRegion() = default;
 
