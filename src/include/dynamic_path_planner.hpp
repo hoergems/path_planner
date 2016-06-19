@@ -53,8 +53,8 @@ namespace shared {
             	
             	void setGoal(boost::shared_ptr<shared::GoalRegion> &goal_region);
                 
-                void setupMotionValidator(std::shared_ptr<shared::RobotEnvironment> &robot_environment, 
-                		                  bool continuous_collision);                
+                /**void setupMotionValidator(std::shared_ptr<shared::RobotEnvironment> &robot_environment, 
+                		                  bool continuous_collision);*/              
                 
                 bool setup(std::shared_ptr<shared::RobotEnvironment> &robot_environment,
                 		   double simulation_step_size,

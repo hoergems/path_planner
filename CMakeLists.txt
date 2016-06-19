@@ -75,14 +75,9 @@ if(PKG_CONFIG_FOUND)
     include_directories(${EIGEN_INCLUDE_DIRS})
     link_directories(${EIGEN_LIBRARY_DIRS})    
 endif()
-
+            
 add_library(path_planner SHARED 
             ${CMAKE_CURRENT_SOURCE_DIR}/src/path_planner.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/MotionValidator.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/ManipulatorGoalRegion.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/GoalRegion.cpp)
-            
-add_library(dynamic_path_planner SHARED 
             ${CMAKE_CURRENT_SOURCE_DIR}/src/dynamic_path_planner.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/MotionValidator.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ManipulatorGoalRegion.cpp
@@ -102,23 +97,12 @@ target_link_libraries (path_planner
                        ${OMPL_LIBRARIES}
                        ${ROBOT_ENVIRONMENT_LIBRARIES})
                        
-target_link_libraries (dynamic_path_planner
-                       ${Boost_LIBRARIES}
-                       ${PYTHON_LIBRARIES}
-                       ${ROBOTS_LIBRARIES}
-                       ${OMPL_LIBRARIES}
-                       ${ROBOT_ENVIRONMENT_LIBRARIES})
-                       
 set(pkg_conf_file_in "${CMAKE_CURRENT_SOURCE_DIR}/path_planner.pc.in")
 set(pkg_conf_file_out "${CMAKE_CURRENT_BINARY_DIR}/path_planner.pc")
 configure_file("${pkg_conf_file_in}" "${pkg_conf_file_out}" @ONLY)
-
-set(pkg_conf_file_in "${CMAKE_CURRENT_SOURCE_DIR}/dynamic_path_planner.pc.in")
-set(pkg_conf_file_out "${CMAKE_CURRENT_BINARY_DIR}/dynamic_path_planner.pc")
-configure_file("${pkg_conf_file_in}" "${pkg_conf_file_out}" @ONLY)
-
+install(FILES "${pkg_conf_file_out}" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/ COMPONENT pkgconfig)
 install(TARGETS path_planner DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(TARGETS dynamic_path_planner DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
 
 install(FILES ${INCLUDE_DIR}/control_sampler.hpp  DESTINATION include/path_planner)
 install(FILES ${INCLUDE_DIR}/control_space.hpp  DESTINATION include/path_planner)
@@ -132,4 +116,4 @@ install(FILES ${INCLUDE_DIR}/path_planner.hpp  DESTINATION include/path_planner)
 install(FILES ${INCLUDE_DIR}/PlanningSpaceInformation.hpp  DESTINATION include/path_planner)
 install(FILES ${INCLUDE_DIR}/rrt_control.hpp  DESTINATION include/path_planner)
 install(FILES ${INCLUDE_DIR}/state_propagator.hpp  DESTINATION include/path_planner)
-install(FILES "${pkg_conf_file_out}" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/ COMPONENT pkgconfig)
+#install(FILES "${pkg_conf_file_out}" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/ COMPONENT pkgconfig)

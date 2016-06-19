@@ -32,13 +32,13 @@ ompl::control::SpaceInformationPtr DynamicPathPlanner::getSpaceInformation() {
 	return space_information_;
 }
 
-void DynamicPathPlanner::setupMotionValidator(std::shared_ptr<shared::RobotEnvironment> &robot_environment,
+/**void DynamicPathPlanner::setupMotionValidator(std::shared_ptr<shared::RobotEnvironment> &robot_environment,
 		                                      bool continuous_collision) {	
 	motionValidator_ = boost::make_shared<MotionValidator>(space_information_,			                                               
 														   continuous_collision,
 														   true);
 	static_cast<shared::MotionValidator *>(motionValidator_.get())->setRobotEnvironment(robot_environment);
-}
+}*/
 
 void DynamicPathPlanner::setRRTGoalBias(double goal_bias) {
 	if (planner_str_ == "EST") {
@@ -119,6 +119,12 @@ bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment> &
 	if (!verbose_) {        
 	    ompl::msg::noOutputHandler();
 	}
+	bool continuous_collision = true;
+	motionValidator_ = boost::make_shared<MotionValidator>(space_information_,			                                               
+														   continuous_collision,
+														   true);
+	static_cast<shared::MotionValidator *>(motionValidator_.get())->setRobotEnvironment(robot_environment);
+	
     state_space_bounds_ = ompl::base::RealVectorBounds(state_space_dimension_);    
     //space_information_->setStateValidityChecker(boost::bind(&DynamicPathPlanner::isValid, this, _1));
     space_information_->setMotionValidator(motionValidator_);
@@ -359,7 +365,7 @@ BOOST_PYTHON_MODULE(libdynamic_path_planner) {
 							   .def("setGoal", &DynamicPathPlanner::setGoal)
 							   .def("isValid", &DynamicPathPlanner::isValidPy)
 							   .def("setup", &DynamicPathPlanner::setup)
-							   .def("setupMotionValidator", &DynamicPathPlanner::setupMotionValidator)
+							   //.def("setupMotionValidator", &DynamicPathPlanner::setupMotionValidator)
 							   .def("getAllStates", &DynamicPathPlanner::getAllStates)
 							   .def("setNumControlSamples", &DynamicPathPlanner::setNumControlSamples)
 							   .def("setMinMaxControlDuration", &DynamicPathPlanner::setMinMaxControlDuration)
