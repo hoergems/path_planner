@@ -8,7 +8,7 @@ struct ManipulatorPathPlannerOptions {
 	
 	std::vector<double> ee_goal_position;
 	
-	std::vector<double> goal_radius;
+	double goal_radius;
 	
 	std::string control_sampler;
 	
