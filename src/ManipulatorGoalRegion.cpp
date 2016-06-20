@@ -64,7 +64,7 @@ namespace shared {
         cout << endl;
         cout << "dist: " << distance << endl;
         cout << "======================" << endl;*/
-        cout << "dist " << distance << endl;
+        //cout << "dist " << distance << endl;
         return distance;             
     } 
     

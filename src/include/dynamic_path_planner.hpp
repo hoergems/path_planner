@@ -37,13 +37,13 @@ using std::endl;
 
 namespace shared {
 
-boost::shared_ptr<shared::GoalRegion> makeManipulatorGoalRegion(const ompl::base::SpaceInformationPtr si,
+ompl::base::GoalPtr makeManipulatorGoalRegion(const ompl::base::SpaceInformationPtr si,
 		                                                        std::shared_ptr<shared::RobotEnvironment> &robot_environment,
 		                                                        std::vector<std::vector<double>> goal_states,
 		                                                        std::vector<double> ee_goal_position,
 		                                                        double ee_goal_threshold);
 
-    typedef boost::shared_ptr<ompl::control::PathControl> PathControlPtr;
+    //typedef ompl::control::PathControlPtr PathControlPtr;
 
     class DynamicPathPlanner {
         public:
@@ -63,7 +63,7 @@ boost::shared_ptr<shared::GoalRegion> makeManipulatorGoalRegion(const ompl::base
             	
             	ompl::base::SpaceInformationPtr getSpaceInformation();
             	
-            	void setGoal(boost::shared_ptr<shared::GoalRegion> &goal_region);
+            	void setGoal(ompl::base::GoalPtr &goal_region);
                 
                 /**void setupMotionValidator(std::shared_ptr<shared::RobotEnvironment> &robot_environment, 
                 		                  bool continuous_collision);*/              
@@ -83,7 +83,7 @@ boost::shared_ptr<shared::GoalRegion> makeManipulatorGoalRegion(const ompl::base
                 
                 void setControlSampler(std::string control_sampler);
                 
-                boost::shared_ptr<shared::GoalRegion> getGoalRegion() const;
+                ompl::base::GoalPtr getGoalRegion() const;
                 
                 bool verbose_;
                 
@@ -101,7 +101,7 @@ boost::shared_ptr<shared::GoalRegion> makeManipulatorGoalRegion(const ompl::base
         private:
                 ompl::base::MotionValidatorPtr motionValidator_;
                 
-                boost::shared_ptr<shared::GoalRegion> goal_region_;
+                ompl::base::GoalPtr goal_region_;
                 
                 double accepted_ = 0.0;
                 

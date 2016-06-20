@@ -60,7 +60,7 @@ namespace shared {
             /** Setup OMPL. This need to be called before solving the motion planning problem*/
             void setup(std::shared_ptr<shared::RobotEnvironment> &robot_environment);
             
-            void setGoal(boost::shared_ptr<shared::GoalRegion> &goalRegion);            
+            void setGoal(ompl::base::GoalPtr &goalRegion);            
             
             ompl::base::MotionValidatorPtr getMotionValidator();
             
@@ -73,7 +73,7 @@ namespace shared {
             		           double ee_goal_threshold);*/
             
         private:
-            boost::shared_ptr<shared::GoalRegion> goal_region_;
+            ompl::base::GoalPtr goal_region_;
             
             /** The dimension of the space we're planning in */
             int dim_;

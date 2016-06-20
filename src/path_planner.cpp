@@ -39,48 +39,41 @@ void PathPlanner::setPlanningDimensions(int &dimensions) {
 void PathPlanner::setupPlanner(std::string planner_str) {
 	planner_str_ = planner_str;
 	if (planner_str == "RRTConnect") {
-	    	planner_ = boost::shared_ptr<ompl::geometric::RRTConnect>(new ompl::geometric::RRTConnect(si_));
-	    	boost::shared_ptr<ompl::geometric::RRTConnect> planner_ptr = boost::static_pointer_cast<ompl::geometric::RRTConnect>(planner_);
-	    	planner_ptr->setRange(planning_range_);
+		    planner_ = ompl::base::PlannerPtr(new ompl::geometric::RRTConnect(si_));	    	
+		    static_cast<ompl::geometric::RRTConnect *>(planner_.get())->setRange(planning_range_);	    	
 	    }
 	    else if (planner_str == "RRT") {
-	        planner_ = boost::shared_ptr<ompl::geometric::RRT>(new ompl::geometric::RRT(si_));
-	        boost::shared_ptr<ompl::geometric::RRT> planner_ptr = boost::static_pointer_cast<ompl::geometric::RRT>(planner_);
-	        planner_ptr->setRange(planning_range_);
-	        planner_ptr->setGoalBias(0.1);
+	    	planner_ = ompl::base::PlannerPtr(new ompl::geometric::RRT(si_));
+	        static_cast<ompl::geometric::RRT *>(planner_.get())->setRange(planning_range_);
+	        static_cast<ompl::geometric::RRT *>(planner_.get())->setGoalBias(0.1);	        
 	    }
 	    else if (planner_str == "SBL"){
-	    	planner_ = boost::shared_ptr<ompl::geometric::SBL>(new ompl::geometric::SBL(si_));
-	    	boost::shared_ptr<ompl::geometric::SBL> planner_ptr = boost::static_pointer_cast<ompl::geometric::SBL>(planner_);
-	    	planner_ptr->setRange(planning_range_);
+	    	planner_ = ompl::base::PlannerPtr(new ompl::geometric::SBL(si_));
+	    	static_cast<ompl::geometric::SBL *>(planner_.get())->setRange(planning_range_);
 	    }
 	    else if (planner_str == "BKPIECE1"){
-	        planner_ = boost::shared_ptr<ompl::geometric::BKPIECE1>(new ompl::geometric::BKPIECE1(si_));
-	        boost::shared_ptr<ompl::geometric::BKPIECE1> planner_ptr = boost::static_pointer_cast<ompl::geometric::BKPIECE1>(planner_);
-	        planner_ptr->setRange(planning_range_);
+	    	planner_ = ompl::base::PlannerPtr(new ompl::geometric::BKPIECE1(si_));
+	    	static_cast<ompl::geometric::BKPIECE1 *>(planner_.get())->setRange(planning_range_);	        
 	    }
 	    else if (planner_str == "PDST"){
-	        planner_ = boost::shared_ptr<ompl::geometric::PDST>(new ompl::geometric::PDST(si_));
-	        boost::shared_ptr<ompl::geometric::PDST> planner_ptr = boost::static_pointer_cast<ompl::geometric::PDST>(planner_);
-	        //planner_ptr->setRange(planning_range_);
-	        planner_ptr->setGoalBias(0.1);
+	    	planner_ = ompl::base::PlannerPtr(new ompl::geometric::PDST(si_));
+	    	static_cast<ompl::geometric::PDST *>(planner_.get())->setGoalBias(0.1);	        
 	    }
 	    else if (planner_str == "STRIDE"){
-	        planner_ = boost::shared_ptr<ompl::geometric::STRIDE>(new ompl::geometric::STRIDE(si_));
-	        boost::shared_ptr<ompl::geometric::STRIDE> planner_ptr = boost::static_pointer_cast<ompl::geometric::STRIDE>(planner_);
-	        planner_ptr->setRange(planning_range_);
+	    	planner_ = ompl::base::PlannerPtr(new ompl::geometric::STRIDE(si_));
+	    	static_cast<ompl::geometric::STRIDE *>(planner_.get())->setRange(planning_range_);
 	    }
 	planner_->setProblemDefinition(problem_definition_);
 }
 
 void PathPlanner::setup(std::shared_ptr<shared::RobotEnvironment> &robot_environment) {	
 	dim_ = robot_environment->getRobot()->getDOF();
-	space_ = boost::make_shared<ompl::base::RealVectorStateSpace>(dim_);
-	//space_(new ompl::base::RealVectorStateSpace(dim_))
-	si_ = boost::make_shared<ompl::base::SpaceInformation>(space_);
-	//si_(new ompl::base::SpaceInformation(space_))
-	problem_definition_ = boost::make_shared<ompl::base::ProblemDefinition>(si_);
-	motionValidator_ = boost::make_shared<shared::MotionValidator>(si_, continuous_collision_, false);			
+	space_ = ompl::base::StateSpacePtr(new ompl::base::RealVectorStateSpace(dim_));
+	si_ = ompl::base::SpaceInformationPtr(new ompl::base::SpaceInformation(space_));
+	
+	problem_definition_ = ompl::base::ProblemDefinitionPtr(new ompl::base::ProblemDefinition(si_));
+	motionValidator_ = ompl::base::MotionValidatorPtr(new shared::MotionValidator(si_, continuous_collision_, false));
+	//motionValidator_ = boost::make_shared<shared::MotionValidator>(si_, continuous_collision_, false);			
 	//problem_definition_(new ompl::base::ProblemDefinition(si_))
 	/**motionValidator_(new MotionValidator(si_,    		                             
 	                                         continuous_collision,										 
@@ -183,7 +176,7 @@ std::vector<std::vector<double> > PathPlanner::genLinearPath(std::vector<double>
     return solution_vector;
 }
 
-void PathPlanner::setGoal(boost::shared_ptr<shared::GoalRegion> &goalRegion) {
+void PathPlanner::setGoal(ompl::base::GoalPtr &goalRegion) {
 	goal_region_ = goalRegion;
 }
 
@@ -236,7 +229,8 @@ std::vector<std::vector<double> > PathPlanner::solve(const std::vector<double> &
     }
     
     std::vector<std::vector<double> > solution_vector;
-    boost::shared_ptr<MotionValidator> mv = boost::static_pointer_cast<MotionValidator>(si_->getMotionValidator());
+	MotionValidator* mv = static_cast<MotionValidator *>(si_->getMotionValidator().get());
+    //boost::shared_ptr<MotionValidator> mv = boost::static_pointer_cast<MotionValidator>(si_->getMotionValidator());
     /** Add the start state to the problem definition */
     if (verbose_) {
         cout << "Adding start state: ";
@@ -250,12 +244,13 @@ std::vector<std::vector<double> > PathPlanner::solve(const std::vector<double> &
     if (!goal_region_) {
     	cout << "PathPlanner: Error: no goal region defined!" << endl;    	
     }
-    problem_definition_->setGoal(boost::static_pointer_cast<ompl::base::Goal>(goal_region_));
+    problem_definition_->setGoal(std::static_pointer_cast<ompl::base::Goal>(goal_region_));
+    //problem_definition_->setGoal(boost::static_pointer_cast<ompl::base::Goal>(goal_region_));
    
     if (check_linear_path_) {    	
         bool collides = false;       
         std::vector<double> goal_state_vec;
-        goal_region_->sampleGoalVec(goal_state_vec);
+        static_cast<shared::GoalRegion *>(goal_region_.get())->sampleGoalVec(goal_state_vec);
         std::vector<std::vector<double> > linear_path(genLinearPath(ss_vec, goal_state_vec));
     
         for (size_t i = 1; i < linear_path.size(); i++) {       
@@ -300,7 +295,11 @@ std::vector<std::vector<double> > PathPlanner::solve(const std::vector<double> &
     	return solution_vector;
     }
     
-    boost::shared_ptr<ompl::geometric::PathGeometric> solution_path = boost::static_pointer_cast<ompl::geometric::PathGeometric>(problem_definition_->getSolutionPath());
+    
+    ompl::geometric::PathGeometric* solution_path = 
+    		static_cast<ompl::geometric::PathGeometric *>(problem_definition_->getSolutionPath().get());
+
+    //boost::shared_ptr<ompl::geometric::PathGeometric> solution_path = boost::static_pointer_cast<ompl::geometric::PathGeometric>(problem_definition_->getSolutionPath());
     
     solution_vector.push_back(ss_vec);    
     /** We found a solution, so get the solution path */

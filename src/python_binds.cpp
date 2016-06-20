@@ -25,7 +25,7 @@ BOOST_PYTHON_MODULE(libpath_planner) {
     
     class_<ompl::base::SpaceInformation, ompl::base::SpaceInformationPtr, boost::noncopyable>("SpaceInformation", no_init);    
     //register_ptr_to_python<ompl::base::SpaceInformationPtr>();
-    class_<GoalRegion, boost::shared_ptr<GoalRegion>, boost::noncopyable>("GoalRegion", no_init);
+    class_<GoalRegion, std::shared_ptr<GoalRegion>, boost::noncopyable>("GoalRegion", no_init);
     
     class_<GoalRegionWrapper, boost::noncopyable>("GoalRegion", init<const ompl::base::SpaceInformationPtr &,
     		                                                         std::shared_ptr<shared::RobotEnvironment>&,

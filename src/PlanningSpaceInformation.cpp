@@ -65,7 +65,7 @@ unsigned int PlanningSpaceInformation::propagateWhileValid(const ompl::base::Sta
 
 ompl::control::DirectedControlSamplerPtr PlanningSpaceInformation::allocDirectedControlSampler() const {	
 	ompl::control::DirectedControlSamplerPtr ptr(new shared::DirectedControlSampler(this, num_control_samples_));	
-	boost::dynamic_pointer_cast<shared::DirectedControlSampler>(ptr)->setNumControlSamples(num_control_samples_);
+	static_cast<shared::DirectedControlSampler *>(ptr.get())->setNumControlSamples(num_control_samples_);
 	return ptr;
 }
 
