@@ -40,6 +40,10 @@ namespace shared {
     class DynamicPathPlanner {
         public:
         		DynamicPathPlanner(bool verbose);
+        		
+        		//copy constructor
+        		DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner> &dynamic_path_planner,
+        				           std::shared_ptr<shared::RobotEnvironment> &robot_environment);
                             
             	~DynamicPathPlanner() {  }
         	
@@ -56,9 +60,7 @@ namespace shared {
                 /**void setupMotionValidator(std::shared_ptr<shared::RobotEnvironment> &robot_environment, 
                 		                  bool continuous_collision);*/              
                 
-                bool setup(std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-                		   double simulation_step_size,
-						   double control_duration,
+                bool setup(std::shared_ptr<shared::RobotEnvironment> &robot_environment,                		   
 						   std::string planner);
                 
                 void getAllStates(std::vector<std::vector<double>> &all_states);
@@ -72,7 +74,22 @@ namespace shared {
                 void setRRTGoalBias(double goal_bias);
                 
                 void setControlSampler(std::string control_sampler);
-
+                
+                boost::shared_ptr<shared::GoalRegion> getGoalRegion() const;
+                
+                bool verbose_;
+                
+                std::string planner_str_;
+                
+                std::vector<int> num_control_samples_;
+                
+                std::string control_sampler_;
+                
+                double rrt_goal_bias_;
+                
+                std::vector<int> min_max_control_duration_;
+                
+                bool add_intermediate_states_;
         private:
                 ompl::base::MotionValidatorPtr motionValidator_;
                 
@@ -108,8 +125,6 @@ namespace shared {
                 // The planner
                 ompl::base::PlannerPtr planner_;
                 
-                std::string planner_str_;
-                
                 ompl::control::StatePropagatorPtr state_propagator_;
                 
                 std::vector<std::vector<double>> goal_states_;
@@ -121,13 +136,10 @@ namespace shared {
                 // Solve the motion planning problem
                 bool solve_(double time_limit);
                 
-                bool setup_ompl_(std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-                		         double &simulation_step_size,
+                bool setup_ompl_(std::shared_ptr<shared::RobotEnvironment> &robot_environment,                		         
                 		         bool &verbose);
                                    
                 ompl::control::ControlSamplerPtr allocUniformControlSampler_(const ompl::control::ControlSpace *control_space);
-                
-                bool verbose_;
                 
                 void log_(std::string msg, bool warn);
                 

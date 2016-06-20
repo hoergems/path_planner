@@ -23,9 +23,50 @@ DynamicPathPlanner::DynamicPathPlanner(bool verbose):
     state_propagator_(nullptr),    
     motionValidator_(nullptr),
     verbose_(verbose),    
-	all_states_()	
+	all_states_(),
+	num_control_samples_(0),
+	control_sampler_(""),
+	rrt_goal_bias_(0.0),
+	min_max_control_duration_(),
+	add_intermediate_states_(true)
 {
     
+}
+
+DynamicPathPlanner::DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner> &dynamic_path_planner,
+		                               std::shared_ptr<shared::RobotEnvironment> &robot_environment):
+	goal_region_(nullptr),
+	state_space_dimension_(0),
+	control_space_dimension_(0),
+    state_space_(nullptr),
+	state_space_bounds_(1),	
+	control_space_(nullptr),
+	space_information_(nullptr),
+	problem_definition_(nullptr),
+	planner_(nullptr),
+	planner_str_(dynamic_path_planner->planner_str_),
+	state_propagator_(nullptr),    
+	motionValidator_(nullptr),
+	verbose_(dynamic_path_planner->verbose_),    
+    all_states_(),
+    num_control_samples_(0),
+    control_sampler_(""),
+    rrt_goal_bias_(0.0),
+    min_max_control_duration_(),
+    add_intermediate_states_(true)
+{
+	setup(robot_environment, planner_str_);
+	boost::shared_ptr<shared::GoalRegion> goal_region = dynamic_path_planner->getGoalRegion();	
+	setGoal(goal_region);	
+	setNumControlSamples(dynamic_path_planner->num_control_samples_);
+	setControlSampler(dynamic_path_planner->control_sampler_);
+	setRRTGoalBias(dynamic_path_planner->rrt_goal_bias_);
+	setMinMaxControlDuration(dynamic_path_planner->min_max_control_duration_);
+	addIntermediateStates(dynamic_path_planner->add_intermediate_states_);
+}
+
+boost::shared_ptr<shared::GoalRegion> DynamicPathPlanner::getGoalRegion() const {
+	return goal_region_;
 }
 
 ompl::control::SpaceInformationPtr DynamicPathPlanner::getSpaceInformation() {
@@ -41,6 +82,7 @@ ompl::control::SpaceInformationPtr DynamicPathPlanner::getSpaceInformation() {
 }*/
 
 void DynamicPathPlanner::setRRTGoalBias(double goal_bias) {
+	rrt_goal_bias_ = goal_bias;
 	if (planner_str_ == "EST") {
 		boost::static_pointer_cast<ESTControl>(planner_)->setGoalBias(goal_bias);
 	}
@@ -60,8 +102,6 @@ void DynamicPathPlanner::log_(std::string msg, bool warn=false) {
 }
 
 bool DynamicPathPlanner::setup(std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-		                       double simulation_step_size,
-							   double control_duration,
 							   std::string planner) {
 	state_space_dimension_ = robot_environment->getRobot()->getStateSpaceDimension();
 	control_space_dimension_ = robot_environment->getRobot()->getControlSpaceDimension();
@@ -73,11 +113,10 @@ bool DynamicPathPlanner::setup(std::shared_ptr<shared::RobotEnvironment> &robot_
 	space_information_ = boost::make_shared<ompl::control::SpaceInformation>(state_space_, control_space_);
 	//space_information_(new PlanningSpaceInformation(state_space_, control_space_))
 	
-	control_duration_ = control_duration;
 	planner_str_ = planner;
 	/***** Setup OMPL *****/
 	log_("Setting up OMPL");
-	setup_ompl_(robot_environment, simulation_step_size, verbose_);
+	setup_ompl_(robot_environment, verbose_);
 	log_("OMPL setup");
 	log_("Setup complete");
 	return true;
@@ -90,21 +129,25 @@ ompl::control::ControlSamplerPtr DynamicPathPlanner::allocUniformControlSampler_
 
 void DynamicPathPlanner::setNumControlSamples(std::vector<int> &num_control_samples) {
 	unsigned int ncs = (unsigned int)num_control_samples[0];
+	num_control_samples_ = num_control_samples;
 	boost::static_pointer_cast<PlanningSpaceInformation>(space_information_)->setNumControlSamples(ncs);	
 }
 
 void DynamicPathPlanner::setControlSampler(std::string control_sampler) {
+	control_sampler_ = control_sampler;
 	boost::static_pointer_cast<shared::ControlSpace>(control_space_)->setControlSampler(control_sampler);
 	//control_space_->setControlSampler(control_sampler);
 }
 
 void DynamicPathPlanner::setMinMaxControlDuration(std::vector<int> &min_max_control_duration) {
+	min_max_control_duration_ = min_max_control_duration;
 	unsigned int min = (unsigned int)min_max_control_duration[0];
 	unsigned int max = (unsigned int)min_max_control_duration[1];
 	space_information_->setMinMaxControlDuration(min, max);	
 }
 
 void DynamicPathPlanner::addIntermediateStates(bool add_intermediate_states) {
+	add_intermediate_states_ = add_intermediate_states;
 	if (planner_str_ == "RRT") {
 		boost::static_pointer_cast<RRTControl>(planner_)->setIntermediateStates(add_intermediate_states);
 	}	
@@ -113,8 +156,7 @@ void DynamicPathPlanner::addIntermediateStates(bool add_intermediate_states) {
 	}
 }
 
-bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-		                             double &simulation_step_size,
+bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment> &robot_environment,		                             
 		                             bool &verbose) {
 	if (!verbose_) {        
 	    ompl::msg::noOutputHandler();
@@ -129,7 +171,7 @@ bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment> &
     //space_information_->setStateValidityChecker(boost::bind(&DynamicPathPlanner::isValid, this, _1));
     space_information_->setMotionValidator(motionValidator_);
     space_information_->setMinMaxControlDuration(1, 1);
-    space_information_->setPropagationStepSize(control_duration_);
+    space_information_->setPropagationStepSize(robot_environment->getControlDuration());
      
     problem_definition_ = boost::make_shared<ompl::base::ProblemDefinition>(space_information_);
     //planner_ = boost::make_shared<ompl::control::RRT>(space_information_);
@@ -144,8 +186,7 @@ bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment> &
     planner_->setProblemDefinition(problem_definition_);    
     
     state_propagator_ = boost::make_shared<StatePropagator>(space_information_,
-    		                                                robot_environment,
-                                                            simulation_step_size,
+    		                                                robot_environment,                                                            
                                                             verbose);    
     space_information_->setStatePropagator(state_propagator_);
     

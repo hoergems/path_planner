@@ -16,8 +16,7 @@ namespace shared {
     class StatePropagator: public ompl::control::StatePropagator {
         public:
             StatePropagator(const ompl::control::SpaceInformationPtr &si, 
-            		        std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-                            double &simulation_step_size,
+            		        std::shared_ptr<shared::RobotEnvironment> &robot_environment,                            
                             bool &verbose);
             
             void propagate(const ompl::base::State *state, 

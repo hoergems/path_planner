@@ -6,14 +6,13 @@ using std::endl;
 namespace shared {
 
 StatePropagator::StatePropagator(const ompl::control::SpaceInformationPtr &si,
-		                         std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-                                 double &simulation_step_size,
+		                         std::shared_ptr<shared::RobotEnvironment> &robot_environment,                                 
                                  bool &verbose):
     ompl::control::StatePropagator(si),
     space_information_(si),    
     model_setup_(false),    
     robot_environment_(robot_environment),
-    simulation_step_size_(simulation_step_size),
+    simulation_step_size_(robot_environment->getSimulationStepSize()),
     verbose_(verbose)
 {
     
