@@ -88,7 +88,8 @@ add_library(path_planner SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/DirectedControlSampler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/EST_control.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/PlanningSpaceInformation.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/rrt_control.cpp)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/rrt_control.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/python_binds.cpp)
             
 target_link_libraries (path_planner
                        ${Boost_LIBRARIES}

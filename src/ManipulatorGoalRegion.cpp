@@ -17,7 +17,7 @@ namespace shared {
         ee_goal_position_(ee_goal_position),
         ee_goal_threshold_(ee_goal_threshold)        
     {   
-        setThreshold(ee_goal_threshold_);
+    	setThreshold(ee_goal_threshold_);
     }
     
     double ManipulatorGoalRegion::euclideanDistance(const std::vector<double> &vec1, const std::vector<double> &vec2) const{
@@ -35,7 +35,7 @@ namespace shared {
         double* v = st->as<ompl::base::RealVectorStateSpace::StateType>()->values;
         for (unsigned int i = 0; i < state_space_information_->getStateDimension(); i++) {
            v1.push_back(v[i]);          
-        }
+        }        
         
         std::vector<double> ee_position;        
         static_cast<shared::ManipulatorRobot *>(robot_environment_->getRobot().get())->getEndEffectorPosition(v1, ee_position);
@@ -45,7 +45,26 @@ namespace shared {
         	ee_g.push_back(ee_goal_position_[i]);
         }*/
         
-        double distance = euclideanDistance(ee_position, ee_goal_position_);        
+        double distance = euclideanDistance(ee_position, ee_goal_position_);
+        /**cout << "state: ";
+        for (auto &k: v1) {
+        	cout << k << ", ";
+        }
+        cout << endl;
+        cout << "goal: ";
+        for (auto &k: ee_goal_position_) {
+        	cout << k << ", ";
+        }
+        cout << endl;
+        
+        cout << "ee_position: ";
+        for (auto &k: ee_position) {
+        	cout << k << ", ";
+        }
+        cout << endl;
+        cout << "dist: " << distance << endl;
+        cout << "======================" << endl;*/
+        cout << "dist " << distance << endl;
         return distance;             
     } 
     
@@ -54,7 +73,7 @@ namespace shared {
     }
 
     void ManipulatorGoalRegion::sampleGoal(ompl::base::State *st) const 
-    {   
+    {	
     	ompl::RNG rng;    	
         int rd = rng.uniformInt(0, goal_states_.size() - 1);   
         double* v = st->as<ompl::base::RealVectorStateSpace::StateType>()->values;
@@ -86,7 +105,7 @@ namespace shared {
     	std::vector<double> ee_position;
     	static_cast<shared::ManipulatorRobot *>(robot_environment_->getRobot().get())->getEndEffectorPosition(joint_angles, ee_position);
     	double sum(0.0);
-    	for (unsigned int i = 0; i < joint_angles.size(); i++) {
+    	for (unsigned int i = 0; i < ee_position.size(); i++) {
     		sum += pow(ee_position[i] - ee_goal_position_[i], 2);
     	}
     	

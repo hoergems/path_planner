@@ -53,8 +53,8 @@ ompl::base::PlannerStatus RRTControl::solve(const ompl::base::PlannerTermination
     bool valid = false;
 
     while (ptc == false)
-    {
-        /* sample random state (with goal biasing) */    	
+    {        
+    	/* sample random state (with goal biasing) */    	
         if (goal_s && rng_.uniform01() < goalBias_ && goal_s->canSample())
             goal_s->sampleGoal(rstate);
         else
@@ -70,11 +70,10 @@ ompl::base::PlannerStatus RRTControl::solve(const ompl::base::PlannerTermination
         /* sample a random control that attempts to go towards the random state, and also sample a control duration */        
         unsigned int cd = controlSampler_->sampleTo(rctrl, nmotion->control, nmotion->state, rmotion->state);        
         if (addIntermediateStates_)
-        {            
+        {        	
         	// this code is contributed by Jennifer Barry
             std::vector<ompl::base::State *> pstates;            
-            cd = msiC_->propagateWhileValid(nmotion->state, rctrl, cd, pstates, true);            
-            
+            cd = msiC_->propagateWhileValid(nmotion->state, rctrl, cd, pstates, true);
             if (cd >= msiC_->getMinControlDuration())
             {
                 Motion *lastmotion = nmotion;

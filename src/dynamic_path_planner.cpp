@@ -9,6 +9,24 @@ using std::endl;
 
 namespace shared {
 
+boost::shared_ptr<shared::GoalRegion> makeManipulatorGoalRegion(const ompl::base::SpaceInformationPtr si,
+		                                                        std::shared_ptr<shared::RobotEnvironment> &robot_environment,
+		                                                        std::vector<std::vector<double>> goal_states,
+		                                                        std::vector<double> ee_goal_position,
+		                                                        double ee_goal_threshold) {
+	if (goal_states.size() == 0) {
+		cout << "No goal states provided. In order to generate a Manipulator goal area, at least one goal state is required." << endl;
+		return nullptr;				
+	}
+	boost::shared_ptr<shared::GoalRegion> manip_goal_region = 
+			boost::make_shared<ManipulatorGoalRegion>(si, robot_environment, goal_states, ee_goal_position, ee_goal_threshold);
+	if (!manip_goal_region) {
+		cout << "NULLLLPTR!!!!!!!!" << endl;
+	}
+	return manip_goal_region;
+}
+
+
 DynamicPathPlanner::DynamicPathPlanner(bool verbose):
     goal_region_(nullptr),
 	state_space_dimension_(0),
@@ -19,15 +37,15 @@ DynamicPathPlanner::DynamicPathPlanner(bool verbose):
     space_information_(nullptr),
     problem_definition_(nullptr),
     planner_(nullptr),
-	planner_str_(""),
+	planner_str_("RRT"),
     state_propagator_(nullptr),    
     motionValidator_(nullptr),
     verbose_(verbose),    
 	all_states_(),
-	num_control_samples_(0),
-	control_sampler_(""),
-	rrt_goal_bias_(0.0),
-	min_max_control_duration_(),
+	num_control_samples_(1),
+	control_sampler_("discrete"),
+	rrt_goal_bias_(0.05),
+	min_max_control_duration_(std::vector<int>({1, 4})),
 	add_intermediate_states_(true)
 {
     
@@ -49,10 +67,10 @@ DynamicPathPlanner::DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner> &dyna
 	motionValidator_(nullptr),
 	verbose_(dynamic_path_planner->verbose_),    
     all_states_(),
-    num_control_samples_(0),
-    control_sampler_(""),
-    rrt_goal_bias_(0.0),
-    min_max_control_duration_(),
+    num_control_samples_(1),
+    control_sampler_("discrete"),
+    rrt_goal_bias_(0.05),
+    min_max_control_duration_(std::vector<int>({1, 4})),
     add_intermediate_states_(true)
 {
 	setup(robot_environment, planner_str_);
@@ -69,7 +87,8 @@ boost::shared_ptr<shared::GoalRegion> DynamicPathPlanner::getGoalRegion() const 
 	return goal_region_;
 }
 
-ompl::control::SpaceInformationPtr DynamicPathPlanner::getSpaceInformation() {
+ompl::base::SpaceInformationPtr DynamicPathPlanner::getSpaceInformation() {
+	assert(space_information_ && "DynamicPathPlanner: Fatal error: space_information not initialized. Did you call setup()?");
 	return space_information_;
 }
 
@@ -127,10 +146,9 @@ ompl::control::ControlSamplerPtr DynamicPathPlanner::allocUniformControlSampler_
     return ompl::control::ControlSamplerPtr(new UniformControlSampler(control_space));
 }
 
-void DynamicPathPlanner::setNumControlSamples(std::vector<int> &num_control_samples) {
-	unsigned int ncs = (unsigned int)num_control_samples[0];
+void DynamicPathPlanner::setNumControlSamples(unsigned int num_control_samples) {	
 	num_control_samples_ = num_control_samples;
-	boost::static_pointer_cast<PlanningSpaceInformation>(space_information_)->setNumControlSamples(ncs);	
+	boost::static_pointer_cast<PlanningSpaceInformation>(space_information_)->setNumControlSamples(num_control_samples);	
 }
 
 void DynamicPathPlanner::setControlSampler(std::string control_sampler) {
@@ -297,7 +315,7 @@ void DynamicPathPlanner::setGoal(boost::shared_ptr<shared::GoalRegion> &goal_reg
 }
 
 std::vector<std::vector<double>> DynamicPathPlanner::solve(const std::vector<double> &start_state_vec,
-		                                                   double timeout) {
+		                                                   double timeout) {	
     // Set the start and goal state	
     ompl::base::ScopedState<> start_state(state_space_);
     std::vector<std::vector<double>> solution_vector; 
@@ -389,32 +407,6 @@ std::vector<std::vector<double>> DynamicPathPlanner::solve(const std::vector<dou
     }
     
     return solution_vector;
-}
-
-BOOST_PYTHON_MODULE(libdynamic_path_planner) {
-    using namespace boost::python;
-    
-    boost::python::type_info info = boost::python::type_id<std::vector<int>>();
-    const boost::python::converter::registration* reg_int = boost::python::converter::registry::query(info);
-    if (reg_int == NULL || (*reg_int).m_to_python == NULL)  {    
-        class_<std::vector<int> > ("v_int")
-            .def(vector_indexing_suite<std::vector<int> >());
-    }
-   
-    class_<DynamicPathPlanner>("DynamicPathPlanner", init<bool>())
-							   .def("solve", &DynamicPathPlanner::solve)		                       
-							   .def("setGoal", &DynamicPathPlanner::setGoal)
-							   .def("isValid", &DynamicPathPlanner::isValidPy)
-							   .def("setup", &DynamicPathPlanner::setup)
-							   //.def("setupMotionValidator", &DynamicPathPlanner::setupMotionValidator)
-							   .def("getAllStates", &DynamicPathPlanner::getAllStates)
-							   .def("setNumControlSamples", &DynamicPathPlanner::setNumControlSamples)
-							   .def("setMinMaxControlDuration", &DynamicPathPlanner::setMinMaxControlDuration)
-							   .def("addIntermediateStates", &DynamicPathPlanner::addIntermediateStates)
-							   .def("setRRTGoalBias", &DynamicPathPlanner::setRRTGoalBias)
-							   .def("setControlSampler", &DynamicPathPlanner::setControlSampler)
-							   .def("getSpaceInformation", &DynamicPathPlanner::getSpaceInformation)
-    ;
 }
  
 }

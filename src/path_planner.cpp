@@ -320,7 +320,7 @@ std::vector<std::vector<double> > PathPlanner::solve(const std::vector<double> &
        
        solution_vector.push_back(vals);
     }   
-    clear();       
+    clear();    
     return augmentPath_(solution_vector);
 } 
 
@@ -377,57 +377,6 @@ std::vector<std::vector<double>> PathPlanner::augmentPath_(std::vector<std::vect
 	return augmented_path;
 }
 
-boost::shared_ptr<shared::GoalRegion> makeManipulatorGoalRegion(const ompl::base::SpaceInformationPtr si,
-		                                                        std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-		                                                        std::vector<std::vector<double>> goal_states,
-		                                                        std::vector<double> ee_goal_position,
-		                                                        double ee_goal_threshold) {
-		                                                        
-	boost::shared_ptr<shared::GoalRegion> manip_goal_region = 
-			boost::make_shared<ManipulatorGoalRegion>(si, robot_environment, goal_states, ee_goal_position, ee_goal_threshold);
-	return manip_goal_region;
-}
 
-BOOST_PYTHON_MODULE(libpath_planner) {
-    using namespace boost::python;  
-    
-    
-    
-    class_<PathPlanner>("PathPlanner", init<double,
-                                            bool,                                            
-                                            double,
-                                            double,
-                                            bool,                                            
-                                            bool>())
-                        .def("solve", &PathPlanner::solve)                        
-                        .def("getSpaceInformation", &PathPlanner::getSpaceInformation)
-                        .def("setGoal", &PathPlanner::setGoal)
-                        .def("isValid", &PathPlanner::isValidPy) 
-                        .def("setPlanningDimensions", &PathPlanner::setPlanningDimensions)
-                        .def("setup", &PathPlanner::setup)
-                        .def("setupPlanner", &PathPlanner::setupPlanner)
-    ;
-    
-    class_<ompl::base::SpaceInformation, ompl::base::SpaceInformationPtr, boost::noncopyable>("SpaceInformation", no_init);
-    //register_ptr_to_python<ompl::base::SpaceInformationPtr>();
-    class_<GoalRegion, boost::shared_ptr<GoalRegion>, boost::noncopyable>("GoalRegion", no_init);
-    
-    class_<GoalRegionWrapper, boost::noncopyable>("GoalRegion", init<const ompl::base::SpaceInformationPtr &,
-    		                                                         std::shared_ptr<shared::RobotEnvironment>&,
-    		                                                         std::vector<std::vector<double>>&>())        		
-    ;
-        
-    class_<shared::ManipulatorGoalRegion, boost::shared_ptr<ManipulatorGoalRegion>, boost::noncopyable>("ManipulatorGoalRegion", 
-    		init<const ompl::base::SpaceInformationPtr&,    		                                                                     
-    		     std::shared_ptr<shared::RobotEnvironment>&,
-    		     std::vector<std::vector<double>> &,                                            
-    		     std::vector<double> &,
-    		     double &>())
-                                             						
-    ;
-    
-    def("makeManipulatorGoalRegion", &makeManipulatorGoalRegion);
-    
-}
 
 }

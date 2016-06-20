@@ -1,5 +1,5 @@
-#ifndef OMPL_CONTROL_TEST_HPP_
-#define OMPL_CONTROL_TEST_HPP_
+#ifndef _DYNAMIC_PATH_PLANNER_HPP_
+#define _DYNAMIC_PATH_PLANNER_HPP_
 #include <iostream>
 #include <boost/timer.hpp>
 #include <boost/thread.hpp>
@@ -29,11 +29,19 @@
 #include <ompl/control/StatePropagator.h>
 #include <ompl/base/MotionValidator.h>
 #include "MotionValidator.hpp"
+#include "ManipulatorGoalRegion.hpp"
 #include <robot_environment/robot_environment.hpp>
 
 using std::cout;
 using std::endl;
+
 namespace shared {
+
+boost::shared_ptr<shared::GoalRegion> makeManipulatorGoalRegion(const ompl::base::SpaceInformationPtr si,
+		                                                        std::shared_ptr<shared::RobotEnvironment> &robot_environment,
+		                                                        std::vector<std::vector<double>> goal_states,
+		                                                        std::vector<double> ee_goal_position,
+		                                                        double ee_goal_threshold);
 
     typedef boost::shared_ptr<ompl::control::PathControl> PathControlPtr;
 
@@ -53,7 +61,7 @@ namespace shared {
         	
             	std::vector<std::vector<double>> solve(const std::vector<double> &start_state_vec, double timeout);
             	
-            	ompl::control::SpaceInformationPtr getSpaceInformation();
+            	ompl::base::SpaceInformationPtr getSpaceInformation();
             	
             	void setGoal(boost::shared_ptr<shared::GoalRegion> &goal_region);
                 
@@ -65,7 +73,7 @@ namespace shared {
                 
                 void getAllStates(std::vector<std::vector<double>> &all_states);
                 
-                void setNumControlSamples(std::vector<int> &num_control_samples);
+                void setNumControlSamples(unsigned int num_control_samples);
                 
                 void setMinMaxControlDuration(std::vector<int> &min_max_control_duration);
                 
@@ -81,7 +89,7 @@ namespace shared {
                 
                 std::string planner_str_;
                 
-                std::vector<int> num_control_samples_;
+                unsigned int num_control_samples_;
                 
                 std::string control_sampler_;
                 

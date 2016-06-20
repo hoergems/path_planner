@@ -21,14 +21,14 @@ unsigned int DirectedControlSampler::sampleTo(ompl::control::Control *control,
 unsigned int DirectedControlSampler::sampleTo(ompl::control::Control *control, 
 		                                                 const ompl::control::Control *previous, 
 		                                                 const ompl::base::State *source, 
-		                                                 ompl::base::State *dest){
+		                                                 ompl::base::State *dest){	
 	if (numControlSamples_ > 1) {		
 		return getBestControl(control, source, dest, previous);
 	}
     
 	cs_->sample(control);
 	const unsigned int minDuration = si_->getMinControlDuration();
-	const unsigned int maxDuration = si_->getMaxControlDuration();
+	const unsigned int maxDuration = si_->getMaxControlDuration();	
 	return cs_->sampleStepCount(minDuration, maxDuration);
 }
 

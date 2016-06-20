@@ -15,10 +15,7 @@ MotionValidator::MotionValidator(const ompl::base::SpaceInformationPtr &si,
     robot_environment_(nullptr),
     continuous_collision_(continuous_collision),    
     dim_(si_->getStateSpace()->getDimension())
-{	
-    if (dynamics) {
-    	dim_ = si_->getStateSpace()->getDimension() / 2;
-    }
+{    
     
 }
 
@@ -121,7 +118,7 @@ bool MotionValidator::collidesDiscrete(const std::vector<double> &state) const{
 }
 
 bool MotionValidator::collidesContinuous(const std::vector<double> &state1,
-            		                     const std::vector<double> &state2) const {
+            		                     const std::vector<double> &state2) const {	
 	std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_start;    	
 	robot_environment_->getRobot()->createRobotCollisionObjects(state1, collision_objects_start);
 	std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_goal;
@@ -131,12 +128,12 @@ bool MotionValidator::collidesContinuous(const std::vector<double> &state1,
 	for (size_t i = 0; i < obstacles.size(); i++) {
 	    if (!obstacles[i]->isTraversable()) {
 	        for (size_t j = 0; j < collision_objects_start.size(); j++) {                	
-	            if (obstacles[i]->in_collision(collision_objects_start[j], collision_objects_goal[j])) {                		
+	            if (obstacles[i]->in_collision(collision_objects_start[j], collision_objects_goal[j])) {	            	
 	                return true;
 	            }
 	        }
 	    }
-	}
+	}	
 	
 	return inSelfCollision(collision_objects_goal);
 	//return false;
@@ -151,7 +148,8 @@ void MotionValidator::setRobotEnvironment(std::shared_ptr<shared::RobotEnvironme
 }
 
 bool MotionValidator::inSelfCollision(std::vector<std::shared_ptr<fcl::CollisionObject>> &robot_collision_objects) const{
-	return robot_environment_->getRobot()->checkSelfCollision(robot_collision_objects);
+	bool in_self_collision = robot_environment_->getRobot()->checkSelfCollision(robot_collision_objects);	
+	return in_self_collision;
 }
 
 void MotionValidator::setContinuousCollisionCheck(bool continuous_collision_check) {

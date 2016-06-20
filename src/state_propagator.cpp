@@ -24,8 +24,7 @@ void StatePropagator::propagate(const ompl::base::State *state,
                                 ompl::base::State *result) const {	
     unsigned int dim = space_information_->getStateSpace()->getDimension();
     unsigned int control_dim = robot_environment_->getRobot()->getControlSpaceDimension();
-    std::vector<double> current_vel;
-    
+    std::vector<double> current_vel; 
     if (verbose_) {
 		cout << "State: ";
 		for (unsigned int i = 0; i < dim; i++) {
@@ -68,7 +67,7 @@ void StatePropagator::propagate(const ompl::base::State *state,
 			cout << propagation_result[i] << ", ";
 		}
 		cout << endl << endl;
-		//sleep(1);
+		sleep(1);
     }
     
     for (unsigned int i = 0; i < dim; i++) {
