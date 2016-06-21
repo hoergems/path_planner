@@ -87,6 +87,10 @@ ompl::base::GoalPtr DynamicPathPlanner::getGoalRegion() const {
 	return goal_region_;
 }
 
+ompl::base::MotionValidatorPtr DynamicPathPlanner::getMotionValidator() const {
+	return motionValidator_;
+}
+
 ompl::base::SpaceInformationPtr DynamicPathPlanner::getSpaceInformation() {
 	assert(space_information_ && "DynamicPathPlanner: Fatal error: space_information not initialized. Did you call setup()?");
 	return space_information_;

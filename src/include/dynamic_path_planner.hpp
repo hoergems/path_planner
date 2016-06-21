@@ -66,7 +66,8 @@ ompl::base::GoalPtr makeManipulatorGoalRegion(const ompl::base::SpaceInformation
             	void setGoal(ompl::base::GoalPtr &goal_region);
                 
                 /**void setupMotionValidator(std::shared_ptr<shared::RobotEnvironment> &robot_environment, 
-                		                  bool continuous_collision);*/              
+                		                  bool continuous_collision);*/ 
+            	ompl::base::MotionValidatorPtr getMotionValidator() const;
                 
                 bool setup(std::shared_ptr<shared::RobotEnvironment> &robot_environment,                		   
 						   std::string planner);
