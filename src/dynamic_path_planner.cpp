@@ -9,21 +9,19 @@ using std::endl;
 
 namespace shared {
 
-ompl::base::GoalPtr makeManipulatorGoalRegion(const ompl::base::SpaceInformationPtr si,
-		                                                        std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-		                                                        std::vector<std::vector<double>> goal_states,
-		                                                        std::vector<double> ee_goal_position,
-		                                                        double ee_goal_threshold) {
+ompl::base::GoalPtr makeRobotGoalRegion(const ompl::base::SpaceInformationPtr si,
+		                                std::shared_ptr<shared::RobotEnvironment> &robot_environment,
+		                                std::vector<std::vector<double>> goal_states) {
 	if (goal_states.size() == 0) {
 		cout << "No goal states provided. In order to generate a Manipulator goal area, at least one goal state is required." << endl;
 		return nullptr;				
 	}
-	ompl::base::GoalPtr manip_goal_region(new ManipulatorGoalRegion(si, robot_environment, goal_states, ee_goal_position, ee_goal_threshold));
+	ompl::base::GoalPtr robot_goal_region(new RobotGoalRegion(si, robot_environment, goal_states));
 			
-	if (!manip_goal_region) {
+	if (!robot_goal_region) {
 		cout << "NULLLLPTR!!!!!!!!" << endl;
 	}
-	return manip_goal_region;
+	return robot_goal_region;
 }
 
 

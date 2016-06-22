@@ -80,7 +80,7 @@ add_library(path_planner SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/path_planner.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/dynamic_path_planner.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/MotionValidator.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/ManipulatorGoalRegion.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/RobotGoalRegion.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/GoalRegion.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/state_propagator.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/control_sampler.cpp
@@ -111,7 +111,7 @@ install(FILES ${INCLUDE_DIR}/DirectedControlSampler.hpp  DESTINATION include/pat
 install(FILES ${INCLUDE_DIR}/dynamic_path_planner.hpp  DESTINATION include/path_planner)
 install(FILES ${INCLUDE_DIR}/EST_control.hpp  DESTINATION include/path_planner)
 install(FILES ${INCLUDE_DIR}/GoalRegion.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/ManipulatorGoalRegion.hpp  DESTINATION include/path_planner)
+install(FILES ${INCLUDE_DIR}/RobotGoalRegion.hpp  DESTINATION include/path_planner)
 install(FILES ${INCLUDE_DIR}/MotionValidator.hpp  DESTINATION include/path_planner)
 install(FILES ${INCLUDE_DIR}/path_planner.hpp  DESTINATION include/path_planner)
 install(FILES ${INCLUDE_DIR}/PlanningSpaceInformation.hpp  DESTINATION include/path_planner)

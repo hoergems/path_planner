@@ -29,7 +29,7 @@
 #include <ompl/control/StatePropagator.h>
 #include <ompl/base/MotionValidator.h>
 #include "MotionValidator.hpp"
-#include "ManipulatorGoalRegion.hpp"
+#include "RobotGoalRegion.hpp"
 #include <robot_environment/robot_environment.hpp>
 
 using std::cout;
@@ -37,11 +37,9 @@ using std::endl;
 
 namespace shared {
 
-ompl::base::GoalPtr makeManipulatorGoalRegion(const ompl::base::SpaceInformationPtr si,
-		                                                        std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-		                                                        std::vector<std::vector<double>> goal_states,
-		                                                        std::vector<double> ee_goal_position,
-		                                                        double ee_goal_threshold);
+ompl::base::GoalPtr makeRobotGoalRegion(const ompl::base::SpaceInformationPtr si,
+		                                std::shared_ptr<shared::RobotEnvironment> &robot_environment,
+		                                std::vector<std::vector<double>> goal_states);
 
     //typedef ompl::control::PathControlPtr PathControlPtr;
 

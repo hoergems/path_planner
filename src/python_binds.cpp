@@ -32,12 +32,10 @@ BOOST_PYTHON_MODULE(libpath_planner) {
     		                                                         std::vector<std::vector<double>>&>())        		
     ;
         
-    class_<shared::ManipulatorGoalRegion, boost::shared_ptr<ManipulatorGoalRegion>, boost::noncopyable>("ManipulatorGoalRegion", 
+    class_<shared::RobotGoalRegion, boost::shared_ptr<RobotGoalRegion>, boost::noncopyable>("RobotGoalRegion", 
     		init<const ompl::base::SpaceInformationPtr&,    		                                                                     
     		     std::shared_ptr<shared::RobotEnvironment>&,
-    		     std::vector<std::vector<double>> &,                                            
-    		     std::vector<double> &,
-    		     double &>())
+    		     std::vector<std::vector<double>> &>())
                                              						
     ;
     
@@ -61,7 +59,7 @@ BOOST_PYTHON_MODULE(libpath_planner) {
     							   .def("getSpaceInformation", &DynamicPathPlanner::getSpaceInformation)
         ;
         
-        def("makeManipulatorGoalRegion", &makeManipulatorGoalRegion);
+        def("makeRobotGoalRegion", &makeRobotGoalRegion);
     
 }
 

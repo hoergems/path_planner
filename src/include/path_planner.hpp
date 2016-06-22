@@ -9,7 +9,7 @@
 #include <ompl/base/ProblemDefinition.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/Goal.h>
-#include "ManipulatorGoalRegion.hpp"
+#include "RobotGoalRegion.hpp"
 #include <boost/make_shared.hpp>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
