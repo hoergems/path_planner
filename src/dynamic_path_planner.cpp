@@ -13,7 +13,7 @@ ompl::base::GoalPtr makeRobotGoalRegion(const ompl::base::SpaceInformationPtr si
 		                                std::shared_ptr<shared::RobotEnvironment> &robot_environment,
 		                                std::vector<std::vector<double>> goal_states) {
 	if (goal_states.size() == 0) {
-		cout << "No goal states provided. In order to generate a Manipulator goal area, at least one goal state is required." << endl;
+		cout << "No goal states provided. In order to generate a goal area, at least one goal state is required." << endl;
 		return nullptr;				
 	}
 	ompl::base::GoalPtr robot_goal_region(new RobotGoalRegion(si, robot_environment, goal_states));
@@ -340,14 +340,6 @@ std::vector<std::vector<double>> DynamicPathPlanner::solve(const std::vector<dou
     	cout << "DynamicPathPlanner: ERROR: Start state is not valid!" << endl;
     	return solution_vector;
     }
-
-    /**ompl::base::GoalPtr gp(new ManipulatorGoalRegion(space_information_,
-    		                                         robot_,
-    		                                         goal_states_, 
-    		                                         ee_goal_position_, 
-    		                                         ee_goal_threshold_,
-    		                                         true));
-    boost::static_pointer_cast<ManipulatorGoalRegion>(gp)->setThreshold(ee_goal_threshold_);*/
     
     problem_definition_->addStartState(start_state);    
     problem_definition_->setGoal(goal_region_);

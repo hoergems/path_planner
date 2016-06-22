@@ -124,7 +124,7 @@ bool MotionValidator::collidesContinuous(const std::vector<double> &state1,
 	std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_goal;
     robot_environment_->getRobot()->createRobotCollisionObjects(state2, collision_objects_goal);
     std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
-    robot_environment_->getObstacles(obstacles);
+    robot_environment_->getObstacles(obstacles);    
 	for (size_t i = 0; i < obstacles.size(); i++) {
 	    if (!obstacles[i]->isTraversable()) {
 	        for (size_t j = 0; j < collision_objects_start.size(); j++) {                	
