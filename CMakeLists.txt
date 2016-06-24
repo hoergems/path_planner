@@ -13,15 +13,16 @@ SET(PYTHON_MIN_VERSION "2.7.0")
 include(FindPkgConfig)
 include(GNUInstallDirs)
 
+set(USE_URDF False)
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/include")
-
 ############################# LOAD PYTHON #############################
 if(PKG_CONFIG_FOUND)    
     pkg_check_modules(PYTHON python-2.7)
     if(NOT PYTHON_FOUND)
        message(FATAL_ERROR "Python could not be found")
     endif()
-    include_directories(${PYTHON_INCLUDE_DIRS})    
+    include_directories(${PYTHON_INCLUDE_DIRS})
+    link_directories(${PYTHON_LIBRARY_DIRS})    
 endif()
 
 ############################# LOAD BOOST #############################
