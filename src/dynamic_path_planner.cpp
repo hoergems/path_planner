@@ -263,22 +263,7 @@ bool DynamicPathPlanner::isValid(const ompl::base::State* state)
     } else {
         rejected_ = rejected_ + 1.0;
         return false;
-    }
-    /**if (valid) {
-        accepted_ = accepted_ + 1.0;
-    }
-    else {
-        cout << "not valid: ";
-        for (unsigned int i = 0; i < space_information_->getStateSpace()->getDimension(); i++) {
-            cout << state->as<ompl::base::RealVectorStateSpace::StateType>()->values[i] << ", ";
-        }
-        cout << endl;
-        rejected_ = rejected_ + 1.0;
-        return false;
-    }
-
-    all_states_.push_back(state_vec);
-    return static_cast<MotionValidator &>(*motionValidator_).isValid(state_vec); */
+    }    
 }
 
 void DynamicPathPlanner::getAllStates(std::vector<std::vector<double>>& all_states)
@@ -331,12 +316,12 @@ bool DynamicPathPlanner::solve_(double time_limit)
 
 void DynamicPathPlanner::setGoal(ompl::base::GoalPtr& goal_region)
 {
-    goal_region_ = goal_region;
+    goal_region_ = goal_region;     
 }
 
 std::vector<std::vector<double>> DynamicPathPlanner::solve(const std::vector<double>& start_state_vec,
         double timeout)
-{
+{  
     // Set the start and goal state
     ompl::base::ScopedState<> start_state(state_space_);
     std::vector<std::vector<double>> solution_vector;

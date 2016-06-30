@@ -65,9 +65,9 @@ bool MotionValidator::satisfiesConstraints(const std::vector<double>& s1) const
     std::vector<double> lower_bounds = si_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds().low;
     std::vector<double> upper_bounds = si_->getStateSpace()->as<ompl::base::RealVectorStateSpace>()->getBounds().high;
     for (size_t i = 0; i < dim_; i++) {
-        if (s1[i] <= lower_bounds[i]) {
+        if (s1[i] < lower_bounds[i]) {
             return false;
-        } else if (s1[i] >= upper_bounds[i]) {
+        } else if (s1[i] > upper_bounds[i]) {
             return false;
         }
     }

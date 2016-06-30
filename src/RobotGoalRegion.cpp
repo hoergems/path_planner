@@ -38,6 +38,7 @@ namespace shared {
            v1.push_back(v[i]);          
         }
         
+        double dist = robot_environment_->getRobot()->distanceGoal(v1);	
         return robot_environment_->getRobot()->distanceGoal(v1);
         //return distance;             
     } 
