@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 project (path_planner)
 
 if (NOT CMAKE_BUILD_TYPE)
-   set(CMAKE_BUILD_TYPE DEBUG)
+   set(CMAKE_BUILD_TYPE RELEASE)
 endif()
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++11 -O3 -DEIGEN_NO_DEBUG -w")
