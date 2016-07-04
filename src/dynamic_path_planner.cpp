@@ -161,8 +161,7 @@ ompl::control::ControlSamplerPtr DynamicPathPlanner::allocUniformControlSampler_
 void DynamicPathPlanner::setNumControlSamples(unsigned int num_control_samples)
 {
     num_control_samples_ = num_control_samples;
-    static_cast<shared::PlanningSpaceInformation*>(space_information_.get())->setNumControlSamples(num_control_samples);
-    //boost::static_pointer_cast<PlanningSpaceInformation>(space_information_)->setNumControlSamples(num_control_samples);
+    static_cast<shared::PlanningSpaceInformation*>(space_information_.get())->setNumControlSamples(num_control_samples);    
 }
 
 void DynamicPathPlanner::setControlSampler(std::string control_sampler)

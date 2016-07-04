@@ -31,7 +31,8 @@ namespace shared {
 
             virtual unsigned int maxSampleCount() const override;
             
-            virtual bool isSatisfied(const ompl::base::State *st) const override;
+            virtual bool isSatisfied(const ompl::base::State *st) const override;    
+	    
 
         private:
             double euclideanDistance(const std::vector<double> &vec1, const std::vector<double> &vec2) const;

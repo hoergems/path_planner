@@ -114,10 +114,10 @@ bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
         state_vec.push_back(state[i]);
     }
 
-    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects;
+    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects;    
     robot_environment_->getRobot()->createRobotCollisionObjects(state_vec, collision_objects);
     std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
-    robot_environment_->getObstacles(obstacles);
+    robot_environment_->getObstacles(obstacles);    
     for (size_t i = 0; i < obstacles.size(); i++) {
         if (!obstacles[i]->getTerrain()->isTraversable()) {
             if (obstacles[i]->in_collision(collision_objects)) {
