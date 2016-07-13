@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 
-project (path_plannermanip)
+project (path_planner6dof)
 
 if (NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE Release)
@@ -36,7 +36,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 ############################# LOAD ROBOTS #############################
 if(PKG_CONFIG_FOUND)    
-    pkg_check_modules(ROBOTS robots)
+    pkg_check_modules(ROBOTS robots6dof)
     if(NOT ROBOTS_FOUND)
        message(FATAL_ERROR "ROBOTS could not be found")
     endif()
@@ -47,7 +47,7 @@ endif()
 
 ############################# LOAD ROBOT_ENVIRONMENT #############################
 if(PKG_CONFIG_FOUND)    
-    pkg_check_modules(ROBOT_ENVIRONMENT robot_environment)
+    pkg_check_modules(ROBOT_ENVIRONMENT robot_environment6dof)
     if(NOT ROBOTS_FOUND)
        message(FATAL_ERROR "ROBOT_ENVIRONMENT could not be found")
     endif()
@@ -75,7 +75,7 @@ if(PKG_CONFIG_FOUND)
     link_directories(${EIGEN_LIBRARY_DIRS})    
 endif()
             
-add_library(path_plannermanip SHARED 
+add_library(path_planner6dof SHARED 
             ${CMAKE_CURRENT_SOURCE_DIR}/src/path_planner.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/dynamic_path_planner.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/MotionValidator.cpp
@@ -90,7 +90,7 @@ add_library(path_plannermanip SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/rrt_control.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/python_binds.cpp)
             
-target_link_libraries (path_plannermanip
+target_link_libraries (path_planner6dof
                        ${Boost_LIBRARIES}
                        ${PYTHON_LIBRARIES}
                        ${ROBOTS_LIBRARIES}
@@ -101,20 +101,20 @@ set(pkg_conf_file_in "${CMAKE_CURRENT_SOURCE_DIR}/path_plannermanip.pc.in")
 set(pkg_conf_file_out "${CMAKE_CURRENT_BINARY_DIR}/path_plannermanip.pc")
 configure_file("${pkg_conf_file_in}" "${pkg_conf_file_out}" @ONLY)
 install(FILES "${pkg_conf_file_out}" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/ COMPONENT pkgconfig)
-install(TARGETS path_plannermanip DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS path_planner6dof DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 
-install(FILES ${INCLUDE_DIR}/control_sampler.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/control_space.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/DirectedControlSampler.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/dynamic_path_planner.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/EST_control.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/GoalRegion.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/RobotGoalRegion.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/MotionValidator.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/path_planner.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/PlanningSpaceInformation.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/rrt_control.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/state_propagator.hpp  DESTINATION include/path_plannermanip)
-install(FILES ${INCLUDE_DIR}/trajectory.hpp  DESTINATION include/path_plannermanip)
+install(FILES ${INCLUDE_DIR}/control_sampler.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/control_space.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/DirectedControlSampler.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/dynamic_path_planner.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/EST_control.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/GoalRegion.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/RobotGoalRegion.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/MotionValidator.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/path_planner.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/PlanningSpaceInformation.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/rrt_control.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/state_propagator.hpp  DESTINATION include/path_planner6dof)
+install(FILES ${INCLUDE_DIR}/trajectory.hpp  DESTINATION include/path_planner6dof)
 #install(FILES "${pkg_conf_file_out}" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/ COMPONENT pkgconfig)
