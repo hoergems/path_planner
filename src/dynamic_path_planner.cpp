@@ -191,6 +191,10 @@ void DynamicPathPlanner::addIntermediateStates(bool add_intermediate_states)
     }
 }
 
+void DynamicPathPlanner::setContinuousCollisionCheck(bool continuous_collision) {
+    static_cast<MotionValidator&>(*motionValidator_).setContinuousCollisionCheck(continuous_collision);   
+}
+
 bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment>& robot_environment,
                                      bool& verbose)
 {
@@ -282,9 +286,10 @@ bool DynamicPathPlanner::solve_(double time_limit)
 {
     bool solved = false;
     bool hasExactSolution = false;
-    while (!solved && !hasExactSolution) {
-        solved = planner_->solve(time_limit);
-
+    bool timeoutReached = false;
+    boost::timer t0;
+    while (!solved && !hasExactSolution && !timeoutReached) {
+        solved = planner_->solve(time_limit);        
         // Get all the solutions
         std::vector<ompl::base::PlannerSolution> solutions = problem_definition_->getSolutions();
         for (size_t i = 0; i < solutions.size(); i++) {
@@ -293,6 +298,9 @@ bool DynamicPathPlanner::solve_(double time_limit)
                 break;
             }
         }
+        if (t0.elapsed() > time_limit) {
+	    return false;
+	}
         // Check if there's an exact solution
     }
     return hasExactSolution;
