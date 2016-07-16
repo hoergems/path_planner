@@ -104,6 +104,8 @@ public:
     void setRRTGoalBias(double goal_bias);
 
     void setControlSampler(std::string control_sampler);
+    
+    void setContinuousCollisionCheck(bool continuous_collision);
 
     ompl::base::GoalPtr getGoalRegion() const;
 
