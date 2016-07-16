@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 
-project (path_planner)
+project (path_planner2dof)
 
 if (NOT CMAKE_BUILD_TYPE)
    set(CMAKE_BUILD_TYPE Release)
@@ -36,7 +36,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 ############################# LOAD ROBOTS #############################
 if(PKG_CONFIG_FOUND)    
-    pkg_check_modules(ROBOTS robots)
+    pkg_check_modules(ROBOTS robots2dof)
     if(NOT ROBOTS_FOUND)
        message(FATAL_ERROR "ROBOTS could not be found")
     endif()
@@ -47,7 +47,7 @@ endif()
 
 ############################# LOAD ROBOT_ENVIRONMENT #############################
 if(PKG_CONFIG_FOUND)    
-    pkg_check_modules(ROBOT_ENVIRONMENT robot_environment)
+    pkg_check_modules(ROBOT_ENVIRONMENT robot_environment2dof)
     if(NOT ROBOTS_FOUND)
        message(FATAL_ERROR "ROBOT_ENVIRONMENT could not be found")
     endif()
@@ -75,7 +75,7 @@ if(PKG_CONFIG_FOUND)
     link_directories(${EIGEN_LIBRARY_DIRS})    
 endif()
             
-add_library(path_planner SHARED 
+add_library(path_planner2dof SHARED 
             ${CMAKE_CURRENT_SOURCE_DIR}/src/path_planner.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/dynamic_path_planner.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/MotionValidator.cpp
@@ -90,18 +90,18 @@ add_library(path_planner SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/rrt_control.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/python_binds.cpp)
             
-target_link_libraries (path_planner
+target_link_libraries (path_planner2dof
                        ${Boost_LIBRARIES}
                        ${PYTHON_LIBRARIES}
                        ${ROBOTS_LIBRARIES}
                        ${OMPL_LIBRARIES}
                        ${ROBOT_ENVIRONMENT_LIBRARIES})
                        
-set(pkg_conf_file_in "${CMAKE_CURRENT_SOURCE_DIR}/path_planner.pc.in")
-set(pkg_conf_file_out "${CMAKE_CURRENT_BINARY_DIR}/path_planner.pc")
+set(pkg_conf_file_in "${CMAKE_CURRENT_SOURCE_DIR}/path_planner2dof.pc.in")
+set(pkg_conf_file_out "${CMAKE_CURRENT_BINARY_DIR}/path_planner2dof.pc")
 configure_file("${pkg_conf_file_in}" "${pkg_conf_file_out}" @ONLY)
 install(FILES "${pkg_conf_file_out}" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/ COMPONENT pkgconfig)
-install(TARGETS path_planner DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS path_planner2dof DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 
 install(FILES ${INCLUDE_DIR}/control_sampler.hpp  DESTINATION include/path_planner)
