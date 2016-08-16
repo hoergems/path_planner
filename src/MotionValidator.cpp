@@ -114,10 +114,10 @@ bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
         state_vec.push_back(state[i]);
     }
 
-    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects;    
+    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects;
     robot_environment_->getRobot()->createRobotCollisionObjects(state_vec, collision_objects);
     std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
-    robot_environment_->getObstacles(obstacles);    
+    robot_environment_->getObstacles(obstacles);
     for (size_t i = 0; i < obstacles.size(); i++) {
         if (!obstacles[i]->getTerrain()->isTraversable()) {
             if (obstacles[i]->in_collision(collision_objects)) {
@@ -172,6 +172,40 @@ bool MotionValidator::inSelfCollision(std::vector<std::shared_ptr<fcl::Collision
 void MotionValidator::setContinuousCollisionCheck(bool continuous_collision_check)
 {
     continuous_collision_ = continuous_collision_check;
+}
+
+void MotionValidator::makeCollisionReport(std::shared_ptr<shared::CollisionReport>& collisionReport)
+{
+    std::vector<double> state1 = collisionReport->state1;
+    std::vector<double> state2 = collisionReport->state2;
+    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_start;
+    robot_environment_->getRobot()->createRobotCollisionObjects(state1, collision_objects_start);
+    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_goal;
+    robot_environment_->getRobot()->createRobotCollisionObjects(state2, collision_objects_goal);
+    std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
+    robot_environment_->getObstacles(obstacles);
+    bool collides = false;
+    for (size_t i = 0; i < obstacles.size(); i++) {
+        for (size_t j = 0; j < collision_objects_start.size(); j++) {
+            if (collisionReport->continuousCollisionCheck) {
+                if (obstacles[i]->in_collision(collision_objects_start[j], collision_objects_goal[j])) {
+                    collides = true;
+		    break;
+                }
+            } else {
+		if (obstacles[i]->in_collision(collision_objects_goal)) {
+		    collides = true;
+		    break;
+		}
+            }
+        }
+        
+        if (collides) {
+	    collisionReport->collidingObstacle = obstacles[i]->getName();
+	    collisionReport->obstacleTraversable = obstacles[i]->isTraversable();
+	}
+
+    }
 }
 
 }
