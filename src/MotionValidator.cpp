@@ -176,36 +176,41 @@ void MotionValidator::setContinuousCollisionCheck(bool continuous_collision_chec
 
 void MotionValidator::makeCollisionReport(std::shared_ptr<shared::CollisionReport>& collisionReport)
 {
-    std::vector<double> state1 = collisionReport->state1;
     std::vector<double> state2 = collisionReport->state2;
-    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_start;
-    robot_environment_->getRobot()->createRobotCollisionObjects(state1, collision_objects_start);
     std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_goal;
     robot_environment_->getRobot()->createRobotCollisionObjects(state2, collision_objects_goal);
     std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
-    robot_environment_->getObstacles(obstacles);
-    bool collides = false;
-    for (size_t i = 0; i < obstacles.size(); i++) {
-        for (size_t j = 0; j < collision_objects_start.size(); j++) {
-            if (collisionReport->continuousCollisionCheck) {
+    robot_environment_->getObstacles(obstacles);    
+    collisionReport->collides = false;
+    unsigned int collidingObstacleIndex = 0;
+    if (collisionReport->continuousCollisionCheck) {
+        std::vector<double> state1 = collisionReport->state1;
+        std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_start;
+        robot_environment_->getRobot()->createRobotCollisionObjects(state1, collision_objects_start);
+        for (size_t i = 0; i < obstacles.size(); i++) {
+            for (size_t j = 0; j < collision_objects_start.size(); j++) {
                 if (obstacles[i]->in_collision(collision_objects_start[j], collision_objects_goal[j])) {
-                    collides = true;
-		    break;
+                    collisionReport->collides = true;
+		    collidingObstacleIndex = i;
+                    break;
                 }
-            } else {
-		if (obstacles[i]->in_collision(collision_objects_goal)) {
-		    collides = true;
-		    break;
-		}
             }
         }
-        
-        if (collides) {
-	    collisionReport->collidingObstacle = obstacles[i]->getName();
-	    collisionReport->obstacleTraversable = obstacles[i]->isTraversable();
-	}
-
+    } else {
+        for (size_t i = 0; i < obstacles.size(); i++) {
+            if (obstacles[i]->in_collision(collision_objects_goal)) {
+                collisionReport->collides = true;
+		collidingObstacleIndex = i;
+                break;
+            }
+        }
     }
+
+    if (collisionReport->collides) {	
+        collisionReport->collidingObstacle = obstacles[collidingObstacleIndex]->getName();
+        collisionReport->obstacleTraversable = obstacles[collidingObstacleIndex]->isTraversable();
+    }
+
 }
 
 }
