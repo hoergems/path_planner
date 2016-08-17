@@ -200,7 +200,7 @@ void MotionValidator::makeCollisionReport(std::shared_ptr<shared::CollisionRepor
         for (size_t i = 0; i < obstacles.size(); i++) {
             if (obstacles[i]->in_collision(collision_objects_goal)) {
                 collisionReport->collides = true;
-		collidingObstacleIndex = i;
+		collidingObstacleIndex = i;                 
                 break;
             }
         }
