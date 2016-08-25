@@ -104,17 +104,8 @@ install(FILES "${pkg_conf_file_out}" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconf
 install(TARGETS path_planner DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 
-install(FILES ${INCLUDE_DIR}/control_sampler.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/control_space.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/DirectedControlSampler.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/dynamic_path_planner.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/EST_control.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/GoalRegion.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/RobotGoalRegion.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/MotionValidator.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/path_planner.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/PlanningSpaceInformation.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/rrt_control.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/state_propagator.hpp  DESTINATION include/path_planner)
-install(FILES ${INCLUDE_DIR}/trajectory.hpp  DESTINATION include/path_planner)
-#install(FILES "${pkg_conf_file_out}" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/ COMPONENT pkgconfig)
+install(DIRECTORY ${INCLUDE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/path_planner
+  FILES_MATCHING PATTERN "*.h" PATTERN "*.hxx" PATTERN "*.hpp"
+  PATTERN ".DS_Store" EXCLUDE
+)
+
