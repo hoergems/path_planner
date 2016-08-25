@@ -28,6 +28,9 @@ public:
     // Continuous collision check
     bool continuousCollisionCheck = false;
     
+    // Ignore unobservable obstacles when doing collision checking
+    bool ignoreUnobservableObstacles = false;
+    
     // Did we collide?
     bool collides = false;
     
@@ -71,6 +74,8 @@ public:
     bool isValid(const std::vector<double>& s1, bool debug = false) const;
 
     void setContinuousCollisionCheck(bool continuous_collision_check);
+    
+    void setIgnoreUnobservableObstacles(bool ignore_unobservable_obstacles);
 
     bool collidesDiscrete(const std::vector<double>& state) const;
 
@@ -93,6 +98,8 @@ private:
     std::mutex mtx;
 
     bool continuous_collision_;
+    
+    bool ignore_unobservable_obstacles_;
 
     unsigned int dim_;
 
