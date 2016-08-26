@@ -11,7 +11,7 @@ namespace shared
 MotionValidator::MotionValidator(const ompl::base::SpaceInformationPtr& si,
                                  bool continuous_collision,
                                  bool dynamics):
-    ompl::base::MotionValidator(si),
+    ompl::base::MotionValidator(si),    
     si_(si),
     robot_environment_(nullptr),
     continuous_collision_(continuous_collision),
@@ -115,9 +115,9 @@ bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
         state_vec.push_back(state[i]);
     }
 
-    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects;
+    std::vector<frapu::CollisionObjectSharedPtr> collision_objects;
     robot_environment_->getRobot()->createRobotCollisionObjects(state_vec, collision_objects);
-    std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
+    std::vector<frapu::ObstacleSharedPtr> obstacles;
     if (ignore_unobservable_obstacles_) {
 	robot_environment_->getObservableObstacles(obstacles);
 	
@@ -128,7 +128,7 @@ bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
     
     for (size_t i = 0; i < obstacles.size(); i++) {
         if (!obstacles[i]->getTerrain()->isTraversable()) {
-            if (obstacles[i]->in_collision(collision_objects)) {
+            if (obstacles[i]->inCollision(collision_objects)) {
                 return true;
             }
         }
@@ -141,22 +141,21 @@ bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
 bool MotionValidator::collidesContinuous(const std::vector<double>& state1,
         const std::vector<double>& state2) const
 {
-    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_start;
+    std::vector<frapu::CollisionObjectSharedPtr> collision_objects_start;
     robot_environment_->getRobot()->createRobotCollisionObjects(state1, collision_objects_start);
-    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_goal;
+    std::vector<frapu::CollisionObjectSharedPtr> collision_objects_goal;
     robot_environment_->getRobot()->createRobotCollisionObjects(state2, collision_objects_goal);    
-    std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
+    std::vector<frapu::ObstacleSharedPtr> obstacles;
     if (ignore_unobservable_obstacles_) {
-	robot_environment_->getObservableObstacles(obstacles);
-	
+	robot_environment_->getObservableObstacles(obstacles);	
     }   
     else {
 	robot_environment_->getObstacles(obstacles);
     }
     for (size_t i = 0; i < obstacles.size(); i++) {
-        if (!obstacles[i]->isTraversable()) {
+        if (!obstacles[i]->getTerrain()->isTraversable()) {
             for (size_t j = 0; j < collision_objects_start.size(); j++) {
-                if (obstacles[i]->in_collision(collision_objects_start[j], collision_objects_goal[j])) {
+                if (obstacles[i]->inCollisionContinuous(collision_objects_start[j], collision_objects_goal[j])) {
                     return true;
                 }
             }
@@ -177,7 +176,7 @@ void MotionValidator::setRobotEnvironment(std::shared_ptr<shared::RobotEnvironme
     robot_environment_ = robot_environment;
 }
 
-bool MotionValidator::inSelfCollision(std::vector<std::shared_ptr<fcl::CollisionObject>>& robot_collision_objects) const
+bool MotionValidator::inSelfCollision(std::vector<frapu::CollisionObjectSharedPtr>& robot_collision_objects) const
 {
     bool in_self_collision = robot_environment_->getRobot()->checkSelfCollision(robot_collision_objects);
     return in_self_collision;
@@ -195,9 +194,9 @@ void MotionValidator::setIgnoreUnobservableObstacles(bool ignore_unobservable_ob
 void MotionValidator::makeCollisionReport(std::shared_ptr<shared::CollisionReport>& collisionReport)
 {
     std::vector<double> state2 = collisionReport->state2;
-    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_goal;
+    std::vector<frapu::CollisionObjectSharedPtr> collision_objects_goal;
     robot_environment_->getRobot()->createRobotCollisionObjects(state2, collision_objects_goal);
-    std::vector<std::shared_ptr<shared::Obstacle>> obstacles;
+    std::vector<frapu::ObstacleSharedPtr> obstacles;
     if (collisionReport->ignoreUnobservableObstacles) {	
 	robot_environment_->getObservableObstacles(obstacles);
     }   
@@ -209,11 +208,11 @@ void MotionValidator::makeCollisionReport(std::shared_ptr<shared::CollisionRepor
     unsigned int collidingObstacleIndex = 0;
     if (collisionReport->continuousCollisionCheck) {
         std::vector<double> state1 = collisionReport->state1;
-        std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_start;
+        std::vector<frapu::CollisionObjectSharedPtr> collision_objects_start;
         robot_environment_->getRobot()->createRobotCollisionObjects(state1, collision_objects_start);
         for (size_t i = 0; i < obstacles.size(); i++) {
             for (size_t j = 0; j < collision_objects_start.size(); j++) {
-                if (obstacles[i]->in_collision(collision_objects_start[j], collision_objects_goal[j])) {
+                if (obstacles[i]->inCollisionContinuous(collision_objects_start[j], collision_objects_goal[j])) {
                     collisionReport->collides = true;
 		    collidingObstacleIndex = i;
                     break;
@@ -222,7 +221,7 @@ void MotionValidator::makeCollisionReport(std::shared_ptr<shared::CollisionRepor
         }
     } else {
         for (size_t i = 0; i < obstacles.size(); i++) {
-            if (obstacles[i]->in_collision(collision_objects_goal)) {
+            if (obstacles[i]->inCollision(collision_objects_goal)) {
                 collisionReport->collides = true;
 		collidingObstacleIndex = i;                 
                 break;
@@ -232,7 +231,7 @@ void MotionValidator::makeCollisionReport(std::shared_ptr<shared::CollisionRepor
 
     if (collisionReport->collides) {	
         collisionReport->collidingObstacle = obstacles[collidingObstacleIndex]->getName();
-        collisionReport->obstacleTraversable = obstacles[collidingObstacleIndex]->isTraversable();
+        collisionReport->obstacleTraversable = obstacles[collidingObstacleIndex]->getTerrain()->isTraversable();
     }
 
 }

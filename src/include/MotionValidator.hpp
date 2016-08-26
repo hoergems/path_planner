@@ -5,16 +5,10 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/State.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
-#include "fcl/BVH/BVH_model.h"
-#include "fcl/BV/BV.h"
-#include "fcl/collision_object.h"
-#include "fcl/shape/geometric_shapes.h"
-#include "fcl/shape/geometric_shapes_utility.h"
 #include <robot_environment/robot_environment.hpp>
 #include <robot_environment/Obstacle.hpp>
 #include <iostream>
 #include <mutex>
-
 
 namespace shared
 {
@@ -84,7 +78,7 @@ public:
 
     bool inSelfCollision(const std::vector<double>& state) const;
 
-    bool inSelfCollision(std::vector<std::shared_ptr<fcl::CollisionObject>>& robot_collision_objects) const;
+    bool inSelfCollision(std::vector<frapu::CollisionObjectSharedPtr>& robot_collision_objects) const;
 
     void setRobotEnvironment(std::shared_ptr<shared::RobotEnvironment>& robot_environment);
     
