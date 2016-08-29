@@ -45,13 +45,23 @@ if(PKG_CONFIG_FOUND)
     message("-- FRAPU_CORE LIB DIRS ${FRAPU_CORE_LIBRARY_DIRS}")    
 endif()
 
+############################# LOAD ROBOT_HEADERS #############################
+if(PKG_CONFIG_FOUND)
+    pkg_check_modules(ROBOT_HEADERS robot_headers)
+    if(NOT ROBOT_HEADERS_FOUND)
+       message(FATAL_ERROR "ROBOT_HEADERS could not be found")
+    endif()
+    include_directories(${ROBOT_HEADERS_INCLUDE_DIRS})
+    link_directories(${ROBOT_HEADERS_LIBRARY_DIRS}) 
+    message("-- ROBOT_HEADERS LIB DIRS ${ROBOT_HEADERS_LIBRARY_DIRS}")    
+endif()
+
 ############################# LOAD ROBOTS #############################
 if(PKG_CONFIG_FOUND)    
     pkg_check_modules(ROBOTS robots)
     if(NOT ROBOTS_FOUND)
        message(FATAL_ERROR "ROBOTS could not be found")
-    endif()
-    include_directories(${ROBOTS_INCLUDE_DIRS})
+    endif()    
     link_directories(${ROBOTS_LIBRARY_DIRS})     
 endif()
 
