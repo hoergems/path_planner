@@ -29,10 +29,10 @@ public:
     bool collides = false;
     
     // The previous state
-    std::vector<double> state1;
+    frapu::RobotStateSharedPtr state1;
 
     // The next state
-    std::vector<double> state2;
+    frapu::RobotStateSharedPtr state2;
 
     // The obstacle we collided with
     std::string collidingObstacle;

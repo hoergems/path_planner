@@ -38,8 +38,8 @@ namespace shared {
            v1.push_back(v[i]);          
         }
         
-        double dist = robot_environment_->getRobot()->distanceGoal(v1);	
-        return robot_environment_->getRobot()->distanceGoal(v1);
+        frapu::RobotStateSharedPtr robotState = std::make_shared<frapu::VectorState>(v1);        
+        return robot_environment_->getRobot()->distanceGoal(robotState);
         //return distance;             
     } 
     
@@ -78,7 +78,8 @@ namespace shared {
     		state_vec.push_back(st->as<ompl::base::RealVectorStateSpace::StateType>()->values[i]);
     	}
     	
-    	return robot_environment_->getRobot()->isTerminal(state_vec);
+    	frapu::RobotStateSharedPtr state = std::make_shared<frapu::VectorState>(state_vec);    	
+    	return robot_environment_->getRobot()->isTerminal(state);
     }
 }
 

@@ -115,8 +115,9 @@ bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
         state_vec.push_back(state[i]);
     }
 
+    frapu::RobotStateSharedPtr robotState = std::make_shared<frapu::VectorState>(state_vec);
     std::vector<frapu::CollisionObjectSharedPtr> collision_objects;
-    robot_environment_->getRobot()->createRobotCollisionObjects(state_vec, collision_objects);
+    robot_environment_->getRobot()->createRobotCollisionObjects(robotState, collision_objects);
     std::vector<frapu::ObstacleSharedPtr> obstacles;
     if (ignore_unobservable_obstacles_) {
 	robot_environment_->getObservableObstacles(obstacles);
@@ -141,10 +142,12 @@ bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
 bool MotionValidator::collidesContinuous(const std::vector<double>& state1,
         const std::vector<double>& state2) const
 {
+    frapu::RobotStateSharedPtr robotState1 = std::make_shared<frapu::VectorState>(state2);
+    frapu::RobotStateSharedPtr robotState2 = std::make_shared<frapu::VectorState>(state2);
     std::vector<frapu::CollisionObjectSharedPtr> collision_objects_start;
-    robot_environment_->getRobot()->createRobotCollisionObjects(state1, collision_objects_start);
+    robot_environment_->getRobot()->createRobotCollisionObjects(robotState1, collision_objects_start);
     std::vector<frapu::CollisionObjectSharedPtr> collision_objects_goal;
-    robot_environment_->getRobot()->createRobotCollisionObjects(state2, collision_objects_goal);    
+    robot_environment_->getRobot()->createRobotCollisionObjects(robotState2, collision_objects_goal);    
     std::vector<frapu::ObstacleSharedPtr> obstacles;
     if (ignore_unobservable_obstacles_) {
 	robot_environment_->getObservableObstacles(obstacles);	
@@ -168,7 +171,8 @@ bool MotionValidator::collidesContinuous(const std::vector<double>& state1,
 
 bool MotionValidator::inSelfCollision(const std::vector<double>& state) const
 {
-    return robot_environment_->getRobot()->checkSelfCollision(state);
+    frapu::RobotStateSharedPtr robotState = std::make_shared<frapu::VectorState>(state);
+    return robot_environment_->getRobot()->checkSelfCollision(robotState);
 }
 
 void MotionValidator::setRobotEnvironment(std::shared_ptr<shared::RobotEnvironment>& robot_environment)
@@ -192,10 +196,9 @@ void MotionValidator::setIgnoreUnobservableObstacles(bool ignore_unobservable_ob
 }
 
 void MotionValidator::makeCollisionReport(std::shared_ptr<shared::CollisionReport>& collisionReport)
-{
-    std::vector<double> state2 = collisionReport->state2;
+{   
     std::vector<frapu::CollisionObjectSharedPtr> collision_objects_goal;
-    robot_environment_->getRobot()->createRobotCollisionObjects(state2, collision_objects_goal);
+    robot_environment_->getRobot()->createRobotCollisionObjects(collisionReport->state2, collision_objects_goal);
     std::vector<frapu::ObstacleSharedPtr> obstacles;
     if (collisionReport->ignoreUnobservableObstacles) {	
 	robot_environment_->getObservableObstacles(obstacles);
@@ -206,10 +209,9 @@ void MotionValidator::makeCollisionReport(std::shared_ptr<shared::CollisionRepor
      
     collisionReport->collides = false;
     unsigned int collidingObstacleIndex = 0;
-    if (collisionReport->continuousCollisionCheck) {
-        std::vector<double> state1 = collisionReport->state1;
+    if (collisionReport->continuousCollisionCheck) {        
         std::vector<frapu::CollisionObjectSharedPtr> collision_objects_start;
-        robot_environment_->getRobot()->createRobotCollisionObjects(state1, collision_objects_start);
+        robot_environment_->getRobot()->createRobotCollisionObjects(collisionReport->state1, collision_objects_start);
         for (size_t i = 0; i < obstacles.size(); i++) {
             for (size_t j = 0; j < collision_objects_start.size(); j++) {
                 if (obstacles[i]->inCollisionContinuous(collision_objects_start[j], collision_objects_goal[j])) {
