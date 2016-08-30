@@ -8,7 +8,6 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/samplers/UniformValidStateSampler.h>
 #include <ompl/util/RandomNumbers.h>
-#include <robots/robot.hpp>
 #include <robot_environment/robot_environment.hpp>
 
 namespace shared {

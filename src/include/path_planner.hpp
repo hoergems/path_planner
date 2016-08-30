@@ -24,7 +24,7 @@
 #include <ompl/util/Console.h>
 #include <ompl/base/MotionValidator.h>
 #include "MotionValidator.hpp"
-#include <robots/robot.hpp>
+#include <robot_headers/robot.hpp>
 #include <boost/timer.hpp>
 
 #include <iostream>

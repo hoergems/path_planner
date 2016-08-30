@@ -9,7 +9,6 @@
 #include <ompl/control/StatePropagator.h>
 #include <ompl/base/State.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <robots/propagator.hpp>
 #include <robot_environment/robot_environment.hpp>
 
 namespace shared {
