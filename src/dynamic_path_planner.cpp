@@ -161,7 +161,7 @@ ompl::control::ControlSamplerPtr DynamicPathPlanner::allocUniformControlSampler_
 void DynamicPathPlanner::setNumControlSamples(unsigned int num_control_samples)
 {
     num_control_samples_ = num_control_samples;
-    static_cast<shared::PlanningSpaceInformation*>(space_information_.get())->setNumControlSamples(num_control_samples);    
+    static_cast<shared::PlanningSpaceInformation*>(space_information_.get())->setNumControlSamples(num_control_samples);
 }
 
 void DynamicPathPlanner::setControlSampler(std::string control_sampler)
@@ -191,8 +191,9 @@ void DynamicPathPlanner::addIntermediateStates(bool add_intermediate_states)
     }
 }
 
-void DynamicPathPlanner::setContinuousCollisionCheck(bool continuous_collision) {
-    static_cast<MotionValidator&>(*motionValidator_).setContinuousCollisionCheck(continuous_collision);   
+void DynamicPathPlanner::setContinuousCollisionCheck(bool continuous_collision)
+{
+    static_cast<MotionValidator&>(*motionValidator_).setContinuousCollisionCheck(continuous_collision);
 }
 
 bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment>& robot_environment,
@@ -208,12 +209,12 @@ bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment>& 
 
     static_cast<shared::MotionValidator*>(motionValidator_.get())->setRobotEnvironment(robot_environment);
 
-    state_space_bounds_ = ompl::base::RealVectorBounds(state_space_dimension_);    
+    state_space_bounds_ = ompl::base::RealVectorBounds(state_space_dimension_);
     space_information_->setMotionValidator(motionValidator_);
     space_information_->setMinMaxControlDuration(1, 1);
     space_information_->setPropagationStepSize(robot_environment->getControlDuration());
 
-    problem_definition_ = ompl::base::ProblemDefinitionPtr(new ompl::base::ProblemDefinition(space_information_));    
+    problem_definition_ = ompl::base::ProblemDefinitionPtr(new ompl::base::ProblemDefinition(space_information_));
     if (planner_str_ == "EST") {
         planner_ = ompl::base::PlannerPtr(new shared::ESTControl(space_information_));
     } else {
@@ -224,7 +225,7 @@ bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment>& 
 
     state_propagator_ = ompl::control::StatePropagatorPtr(new shared::StatePropagator(space_information_,
                         robot_environment,
-                        verbose));    
+                        verbose));
     space_information_->setStatePropagator(state_propagator_);
 
     // Set the bounds
@@ -235,8 +236,14 @@ bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<shared::RobotEnvironment>& 
     std::vector<double> lowerControlLimits;
     std::vector<double> upperControlLimits;
 
-    robot_environment->getRobot()->getStateLimits(lowerStateLimits, upperStateLimits);
-    robot_environment->getRobot()->getControlLimits(lowerControlLimits, upperControlLimits);
+    std::shared_ptr<shared::Robot> robot = robot_environment->getRobot();
+
+    frapu::StateLimitsSharedPtr stateLimits = robot->getStateSpace()->getStateLimits();
+    static_cast<frapu::VectorStateLimits*>(stateLimits.get())->getVectorLimits(lowerStateLimits, upperStateLimits);
+
+    frapu::ActionLimitsSharedPtr actionLimits =
+        robot->getActionSpace()->getActionLimits();
+    static_cast<frapu::VectorActionLimits *>(actionLimits.get())->getRawLimits(lowerControlLimits, upperControlLimits);
 
     for (size_t i = 0; i < lowerStateLimits.size(); i++) {
         state_space_bounds_.setLow(i, lowerStateLimits[i]);
@@ -266,7 +273,7 @@ bool DynamicPathPlanner::isValid(const ompl::base::State* state)
     } else {
         rejected_ = rejected_ + 1.0;
         return false;
-    }    
+    }
 }
 
 void DynamicPathPlanner::getAllStates(std::vector<std::vector<double>>& all_states)
@@ -289,7 +296,7 @@ bool DynamicPathPlanner::solve_(double time_limit)
     bool timeoutReached = false;
     boost::timer t0;
     while (!solved && !hasExactSolution && !timeoutReached) {
-        solved = planner_->solve(time_limit);        
+        solved = planner_->solve(time_limit);
         // Get all the solutions
         std::vector<ompl::base::PlannerSolution> solutions = problem_definition_->getSolutions();
         for (size_t i = 0; i < solutions.size(); i++) {
@@ -299,8 +306,8 @@ bool DynamicPathPlanner::solve_(double time_limit)
             }
         }
         if (t0.elapsed() > time_limit) {
-	    return false;
-	}
+            return false;
+        }
         // Check if there's an exact solution
     }
     return hasExactSolution;
@@ -323,12 +330,12 @@ bool DynamicPathPlanner::solve_(double time_limit)
 
 void DynamicPathPlanner::setGoal(ompl::base::GoalPtr& goal_region)
 {
-    goal_region_ = goal_region;     
+    goal_region_ = goal_region;
 }
 
 std::vector<std::vector<double>> DynamicPathPlanner::solve(const std::vector<double>& start_state_vec,
         double timeout)
-{  
+{
     // Set the start and goal state
     ompl::base::ScopedState<> start_state(state_space_);
     std::vector<std::vector<double>> solution_vector;

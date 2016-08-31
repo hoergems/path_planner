@@ -81,7 +81,10 @@ void PathPlanner::setup(std::shared_ptr<shared::RobotEnvironment>& robot_environ
     std::vector<double> lowerStateLimits;
     std::vector<double> upperStateLimits;
     ompl::base::RealVectorBounds bounds(dim_);
-    robot_environment->getRobot()->getStateLimits(lowerStateLimits, upperStateLimits);
+    frapu::StateLimitsSharedPtr stateLimits =
+        robot_environment->getRobot()->getStateSpace()->getStateLimits();
+    static_cast<frapu::VectorStateLimits*>(stateLimits.get())->getVectorLimits(lowerStateLimits, upperStateLimits);
+
     if (robot_environment->getRobot()->constraintsEnforced()) {
         for (size_t i = 0; i < dim_; i++) {
             bounds.setLow(i, lowerStateLimits[i]);
@@ -387,3 +390,4 @@ std::vector<std::vector<double>> PathPlanner::augmentPath_(std::vector<std::vect
 
 
 }
+
