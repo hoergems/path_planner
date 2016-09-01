@@ -129,9 +129,9 @@ void DynamicPathPlanner::log_(std::string msg, bool warn = false)
 
 bool DynamicPathPlanner::setup(std::shared_ptr<shared::RobotEnvironment>& robot_environment,
                                std::string planner)
-{
-    state_space_dimension_ = robot_environment->getRobot()->getStateSpaceDimension();
-    control_space_dimension_ = robot_environment->getRobot()->getControlSpaceDimension();
+{    
+    state_space_dimension_ = robot_environment->getRobot()->getStateSpace()->getNumDimensions();    
+    control_space_dimension_ = robot_environment->getRobot()->getActionSpace()->getNumDimensions();
 
     state_space_ = ompl::base::StateSpacePtr(new ompl::base::RealVectorStateSpace(state_space_dimension_));
     //state_space_ = boost::make_shared<ompl::base::RealVectorStateSpace>(state_space_dimension_);

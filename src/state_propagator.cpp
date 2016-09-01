@@ -25,7 +25,7 @@ void StatePropagator::propagate(const ompl::base::State* state,
                                 ompl::base::State* result) const
 {
     unsigned int dim = space_information_->getStateSpace()->getDimension();
-    unsigned int control_dim = robot_environment_->getRobot()->getControlSpaceDimension();
+    unsigned int control_dim = robot_environment_->getRobot()->getActionSpace()->getNumDimensions();    
     std::vector<double> current_vel;
     if (verbose_) {
         cout << "State: ";
