@@ -7,7 +7,7 @@
 #include <ompl/util/RandomNumbers.h>
 #include "control_sampler.hpp"
 
-namespace shared {
+namespace frapu {
 
     class ControlSpace : public ompl::control::RealVectorControlSpace
     {

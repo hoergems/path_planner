@@ -10,12 +10,12 @@
 #include <ompl/util/RandomNumbers.h>
 #include <robot_environment/robot_environment.hpp>
 
-namespace shared {
+namespace frapu {
 
 class GoalRegion: public ompl::base::GoalSampleableRegion {
 public:
 	GoalRegion(const ompl::base::SpaceInformationPtr &si,
-			   std::shared_ptr<shared::RobotEnvironment> &robot_environment,
+			   std::shared_ptr<RobotEnvironment> &robot_environment,
                std::vector<std::vector<double>> &goal_states);
 	
 	virtual double distanceGoal(const ompl::base::State *st) const = 0;
@@ -29,7 +29,7 @@ public:
 	virtual bool isSatisfied(const ompl::base::State *st) const = 0;	
 
 protected:
-	std::shared_ptr<shared::RobotEnvironment> robot_environment_;
+	std::shared_ptr<RobotEnvironment> robot_environment_;
 	
 	ompl::base::SpaceInformationPtr state_space_information_;
 	
@@ -42,7 +42,7 @@ protected:
 struct GoalRegionWrapper: GoalRegion, boost::python::wrapper<GoalRegion> {
 public:
 	GoalRegionWrapper(const ompl::base::SpaceInformationPtr &si,
-			          std::shared_ptr<shared::RobotEnvironment> &robot_environment,
+			          std::shared_ptr<RobotEnvironment> &robot_environment,
                       std::vector<std::vector<double>> &goal_states):
          GoalRegion(si, robot_environment, goal_states)
     {		

@@ -9,32 +9,33 @@
 #include "DirectedControlSampler.hpp"
 
 
-namespace shared {
+namespace frapu
+{
 
-    class PlanningSpaceInformation : public ompl::control::SpaceInformation
-    {
-        public:    	
-    	    PlanningSpaceInformation(const ompl::base::StateSpacePtr &stateSpace, 
-            		                 const ompl::control::ControlSpacePtr &controlSpace);
-            
-            ompl::control::DirectedControlSamplerPtr allocDirectedControlSampler() const;
-            
-            double getPropagationStepSize() const;
-            
-            void setNumControlSamples(unsigned int &num_control_samples);
-            
-            unsigned int propagateWhileValid(const ompl::base::State *state, 
-            		                         const ompl::control::Control *control, 
-											 int steps, 
-											 std::vector<ompl::base::State*> &result, 
-											 bool alloc) const;
-            
-            //unsigned int getMinControlDuration();
-            
-        private:
-            unsigned int num_control_samples_;
-                        
-    };
+class PlanningSpaceInformation : public ompl::control::SpaceInformation
+{
+public:
+    PlanningSpaceInformation(const ompl::base::StateSpacePtr& stateSpace,
+                             const ompl::control::ControlSpacePtr& controlSpace);
+
+    ompl::control::DirectedControlSamplerPtr allocDirectedControlSampler() const;
+
+    double getPropagationStepSize() const;
+
+    void setNumControlSamples(unsigned int& num_control_samples);
+
+    unsigned int propagateWhileValid(const ompl::base::State* state,
+                                     const ompl::control::Control* control,
+                                     int steps,
+                                     std::vector<ompl::base::State*>& result,
+                                     bool alloc) const;
+
+    //unsigned int getMinControlDuration();
+
+private:
+    unsigned int num_control_samples_;
+
+};
 
 }
 

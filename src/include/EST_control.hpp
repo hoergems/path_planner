@@ -6,7 +6,7 @@
 #include "PlanningSpaceInformation.hpp"
 #include "MotionValidator.hpp"
 
-namespace shared {
+namespace frapu {
 	class ESTControl : public ompl::control::EST {
 	    public:
 		    ESTControl(const ompl::control::SpaceInformationPtr &si);

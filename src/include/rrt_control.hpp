@@ -11,14 +11,16 @@
 #include "MotionValidator.hpp"
 #include <iostream>
 
-namespace shared {
-    class RRTControl : public ompl::control::RRT {
-        public:
-		    RRTControl(const ompl::control::SpaceInformationPtr &si);
-	    
-	        ompl::base::PlannerStatus solve(const ompl::base::PlannerTerminationCondition &ptc);
-	
-    };
+namespace frapu
+{
+class RRTControl : public ompl::control::RRT
+{
+public:
+    RRTControl(const ompl::control::SpaceInformationPtr& si);
+
+    ompl::base::PlannerStatus solve(const ompl::base::PlannerTerminationCondition& ptc);
+
+};
 }
 
 #endif

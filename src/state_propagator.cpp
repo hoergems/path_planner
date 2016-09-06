@@ -3,11 +3,11 @@
 using std::cout;
 using std::endl;
 
-namespace shared
+namespace frapu
 {
 
 StatePropagator::StatePropagator(const ompl::control::SpaceInformationPtr& si,
-                                 std::shared_ptr<shared::RobotEnvironment>& robot_environment,
+                                 std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
                                  bool& verbose):
     ompl::control::StatePropagator(si),
     space_information_(si),
@@ -25,7 +25,7 @@ void StatePropagator::propagate(const ompl::base::State* state,
                                 ompl::base::State* result) const
 {
     unsigned int dim = space_information_->getStateSpace()->getDimension();
-    unsigned int control_dim = robot_environment_->getRobot()->getActionSpace()->getNumDimensions();    
+    unsigned int control_dim = robot_environment_->getRobot()->getActionSpace()->getNumDimensions();
     std::vector<double> current_vel;
     if (verbose_) {
         cout << "State: ";
@@ -52,23 +52,23 @@ void StatePropagator::propagate(const ompl::base::State* state,
         actionVec.push_back(control->as<ompl::control::RealVectorControlSpace::ControlType>()->values[i]);
         controlErrorVec.push_back(0.0);
     }
-    
+
     frapu::RobotStateSharedPtr currentState = std::make_shared<frapu::VectorState>(currentStateVec);
     frapu::ActionSharedPtr action = std::make_shared<frapu::VectorAction>(actionVec);
     frapu::RobotStateSharedPtr resultingState;
 
     double dur = duration;
     double sss = simulation_step_size_;
-    
+
     robot_environment_->getRobot()->propagateState(currentState,
             action,
             controlErrorVec,
             dur,
             sss,
             resultingState);
-    
-    std::vector<double> resultVec = static_cast<frapu::VectorState *>(resultingState.get())->asVector();
-    
+
+    std::vector<double> resultVec = static_cast<frapu::VectorState*>(resultingState.get())->asVector();
+
     if (verbose_) {
         cout << "Propagation result: ";
         for (size_t i = 0; i < resultVec.size(); i++) {

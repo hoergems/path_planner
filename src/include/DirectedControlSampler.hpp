@@ -4,7 +4,7 @@
 #include <ompl/control/ControlSampler.h>
 #include <ompl/control/SpaceInformation.h>
 
-namespace shared {
+namespace frapu {
     class DirectedControlSampler: public ompl::control::SimpleDirectedControlSampler {
     	public:
     	    DirectedControlSampler(const ompl::control::SpaceInformation *si, unsigned int k);

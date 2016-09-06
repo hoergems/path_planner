@@ -8,7 +8,7 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <iostream>
 
-namespace shared {
+namespace frapu {
 
     class UniformControlSampler : public ompl::control::ControlSampler
     {

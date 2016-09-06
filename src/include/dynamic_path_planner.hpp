@@ -31,27 +31,28 @@
 #include "MotionValidator.hpp"
 #include "RobotGoalRegion.hpp"
 #include <robot_environment/robot_environment.hpp>
+#include "trajectory.hpp"
 
 using std::cout;
 using std::endl;
 
-namespace shared
+namespace frapu
 {
 
 ompl::base::GoalPtr makeRobotGoalRegion(const ompl::base::SpaceInformationPtr si,
-                                        std::shared_ptr<shared::RobotEnvironment>& robot_environment,
+                                        std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
                                         std::vector<std::vector<double>> goal_states);
 
 //typedef ompl::control::PathControlPtr PathControlPtr;
 
-class DynamicPathPlanner
+class DynamicPathPlanner: public PathPlanner
 {
 public:
     DynamicPathPlanner(bool verbose);
 
     //copy constructor
     DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner>& dynamic_path_planner,
-                       std::shared_ptr<shared::RobotEnvironment>& robot_environment);
+                       std::shared_ptr<frapu::RobotEnvironment>& robot_environment);
 
     ~DynamicPathPlanner() {
         //cout << "RESET" << endl;
@@ -79,8 +80,11 @@ public:
     bool isValid(const ompl::base::State* state);
 
     bool isValidPy(std::vector<double>& state);
+    
+    virtual TrajectorySharedPtr solve(const RobotStateSharedPtr &robotState, 
+				      double timeout) override;
 
-    std::vector<std::vector<double>> solve(const std::vector<double>& start_state_vec, double timeout);
+    VectorTrajectory solve(const std::vector<double>& start_state_vec, double timeout);
 
     ompl::base::SpaceInformationPtr getSpaceInformation();
 
@@ -90,7 +94,7 @@ public:
                               bool continuous_collision);*/
     ompl::base::MotionValidatorPtr getMotionValidator() const;
 
-    bool setup(std::shared_ptr<shared::RobotEnvironment>& robot_environment,
+    bool setup(std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
                std::string planner);
 
     void getAllStates(std::vector<std::vector<double>>& all_states);
@@ -168,7 +172,7 @@ private:
     // Solve the motion planning problem
     bool solve_(double time_limit);
 
-    bool setup_ompl_(std::shared_ptr<shared::RobotEnvironment>& robot_environment,
+    bool setup_ompl_(std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
                      bool& verbose);
 
     ompl::control::ControlSamplerPtr allocUniformControlSampler_(const ompl::control::ControlSpace* control_space);

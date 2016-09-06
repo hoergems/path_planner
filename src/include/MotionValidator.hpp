@@ -10,7 +10,7 @@
 #include <iostream>
 #include <mutex>
 
-namespace shared
+namespace frapu
 {
     
 class CollisionReport {
@@ -80,14 +80,14 @@ public:
 
     bool inSelfCollision(std::vector<frapu::CollisionObjectSharedPtr>& robot_collision_objects) const;
 
-    void setRobotEnvironment(std::shared_ptr<shared::RobotEnvironment>& robot_environment);
+    void setRobotEnvironment(std::shared_ptr<frapu::RobotEnvironment>& robot_environment);
     
-    void makeCollisionReport(std::shared_ptr<shared::CollisionReport> &collisionReport);
+    void makeCollisionReport(std::shared_ptr<frapu::CollisionReport> &collisionReport);
 
 private:
     const ompl::base::SpaceInformationPtr si_;
 
-    std::shared_ptr<shared::RobotEnvironment> robot_environment_;
+    std::shared_ptr<frapu::RobotEnvironment> robot_environment_;
 
     std::mutex mtx;
 

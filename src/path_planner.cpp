@@ -3,15 +3,16 @@
 using std::cout;
 using std::endl;
 
-namespace shared
+namespace frapu
 {
 
-PathPlanner::PathPlanner(double delta_t,
-                         bool continuous_collision,
-                         double max_joint_velocity,
-                         double stretching_factor,
-                         bool check_linear_path,
-                         bool verbose):
+StandardPathPlanner::StandardPathPlanner(double delta_t,
+        bool continuous_collision,
+        double max_joint_velocity,
+        double stretching_factor,
+        bool check_linear_path,
+        bool verbose):
+    PathPlanner(),
     goal_region_(nullptr),
     dim_(0),
     delta_t_(delta_t),
@@ -33,12 +34,12 @@ PathPlanner::PathPlanner(double delta_t,
     }
 }
 
-void PathPlanner::setPlanningDimensions(int& dimensions)
+void StandardPathPlanner::setPlanningDimensions(int& dimensions)
 {
     dim_ = dimensions;
 }
 
-void PathPlanner::setupPlanner(std::string planner_str)
+void StandardPathPlanner::setupPlanner(std::string planner_str)
 {
     planner_str_ = planner_str;
     if (planner_str == "RRTConnect") {
@@ -64,20 +65,20 @@ void PathPlanner::setupPlanner(std::string planner_str)
     planner_->setProblemDefinition(problem_definition_);
 }
 
-void PathPlanner::setup(std::shared_ptr<shared::RobotEnvironment>& robot_environment)
+void StandardPathPlanner::setup(std::shared_ptr<frapu::RobotEnvironment>& robot_environment)
 {
     dim_ = robot_environment->getRobot()->getDOF();
     space_ = ompl::base::StateSpacePtr(new ompl::base::RealVectorStateSpace(dim_));
     si_ = ompl::base::SpaceInformationPtr(new ompl::base::SpaceInformation(space_));
 
     problem_definition_ = ompl::base::ProblemDefinitionPtr(new ompl::base::ProblemDefinition(si_));
-    motionValidator_ = ompl::base::MotionValidatorPtr(new shared::MotionValidator(si_, continuous_collision_, false));
+    motionValidator_ = std::make_shared<frapu::MotionValidator>(si_, continuous_collision_, false);    
     //motionValidator_ = boost::make_shared<shared::MotionValidator>(si_, continuous_collision_, false);
     //problem_definition_(new ompl::base::ProblemDefinition(si_))
     /**motionValidator_(new MotionValidator(si_,
                                              continuous_collision,
                                              false))*/
-    static_cast<shared::MotionValidator*>(motionValidator_.get())->setRobotEnvironment(robot_environment);
+    static_cast<frapu::MotionValidator*>(motionValidator_.get())->setRobotEnvironment(robot_environment);
     std::vector<double> lowerStateLimits;
     std::vector<double> upperStateLimits;
     ompl::base::RealVectorBounds bounds(dim_);
@@ -101,25 +102,25 @@ void PathPlanner::setup(std::shared_ptr<shared::RobotEnvironment>& robot_environ
     space_->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
 
     /** Set the StateValidityChecker */
-    si_->setStateValidityChecker(boost::bind(&PathPlanner::isValid, this, _1));
+    si_->setStateValidityChecker(boost::bind(&StandardPathPlanner::isValid, this, _1));
 
     /** Set the MotionValidation */
     si_->setMotionValidator(motionValidator_);
 }
 
-ompl::base::MotionValidatorPtr PathPlanner::getMotionValidator()
+ompl::base::MotionValidatorPtr StandardPathPlanner::getMotionValidator()
 {
     assert(motionValidator_ && "MotionValidator in path planner is null!!!");
     return motionValidator_;
 }
 
-bool PathPlanner::isValidPy(std::vector<double>& state)
+bool StandardPathPlanner::isValidPy(std::vector<double>& state)
 {
     bool valid = static_cast<MotionValidator&>(*motionValidator_).isValid(state);
     return valid;
 }
 
-bool PathPlanner::isValid(const ompl::base::State* state)
+bool StandardPathPlanner::isValid(const ompl::base::State* state)
 {
     std::vector<double> state_vec;
     for (unsigned int i = 0; i < si_->getStateSpace()->getDimension(); i++) {
@@ -128,7 +129,7 @@ bool PathPlanner::isValid(const ompl::base::State* state)
     return static_cast<MotionValidator&>(*motionValidator_).isValid(state_vec);
 }
 
-void PathPlanner::clear()
+void StandardPathPlanner::clear()
 {
     planner_->clear();
     if (problem_definition_->hasSolution()) {
@@ -140,7 +141,7 @@ void PathPlanner::clear()
     }
 }
 
-void PathPlanner::clearAll()
+void StandardPathPlanner::clearAll()
 {
     clear();
     if (problem_definition_->getGoal()) {
@@ -150,7 +151,7 @@ void PathPlanner::clearAll()
 }
 
 /** Generates a linear path from point p1 to point p2 */
-std::vector<std::vector<double> > PathPlanner::genLinearPath(std::vector<double>& p1, std::vector<double>& p2)
+std::vector<std::vector<double> > StandardPathPlanner::genLinearPath(std::vector<double>& p1, std::vector<double>& p2)
 {
     std::vector<double> vec;
     std::vector<double> vec_res;
@@ -184,12 +185,12 @@ std::vector<std::vector<double> > PathPlanner::genLinearPath(std::vector<double>
     return solution_vector;
 }
 
-void PathPlanner::setGoal(ompl::base::GoalPtr& goalRegion)
+void StandardPathPlanner::setGoal(ompl::base::GoalPtr& goalRegion)
 {
     goal_region_ = goalRegion;
 }
 
-ompl::base::SpaceInformationPtr PathPlanner::getSpaceInformation()
+ompl::base::SpaceInformationPtr StandardPathPlanner::getSpaceInformation()
 {
     return si_;
 }
@@ -209,7 +210,7 @@ ompl::base::SpaceInformationPtr PathPlanner::getSpaceInformation()
     ee_goal_threshold_ = ee_goal_threshold;
 }*/
 
-bool PathPlanner::solve_(double time_limit)
+bool StandardPathPlanner::solve_(double time_limit)
 {
     bool solved = false;
     bool hasExactSolution = false;
@@ -229,8 +230,30 @@ bool PathPlanner::solve_(double time_limit)
     return false;
 }
 
+TrajectorySharedPtr StandardPathPlanner::solve(const RobotStateSharedPtr& robotState,
+        double timeout)
+{
+    TrajectorySharedPtr trajectory;
+    std::vector<double> startStateVec = static_cast<VectorState*>(robotState.get())->asVector();
+    VectorTrajectory vectorTrajectory = solve(startStateVec, timeout);
+    if (vectorTrajectory.states.size() == 0) {
+        return nullptr;
+    }
+    trajectory->stateTrajectory = std::vector<RobotStateSharedPtr>(vectorTrajectory.states.size());
+    trajectory->observationTrajectory = std::vector<ObservationSharedPtr>(vectorTrajectory.observations.size());
+    trajectory->actionTrajectory = std::vector<ActionSharedPtr>(vectorTrajectory.controls.size());
+    for (size_t i = 0; i < vectorTrajectory.states.size(); i++) {
+        trajectory->stateTrajectory[i] = std::make_shared<VectorState>(vectorTrajectory.states[i]);
+        trajectory->observationTrajectory[i] = std::make_shared<VectorObservation>(vectorTrajectory.observations[i]);
+        trajectory->actionTrajectory[i] = std::make_shared<VectorAction>(vectorTrajectory.controls[i]);
+    }
+
+    return trajectory;
+}
+
 /** Solves the motion planning problem */
-std::vector<std::vector<double> > PathPlanner::solve(const std::vector<double>& start_state_vec, double timeout)
+
+VectorTrajectory StandardPathPlanner::solve(const std::vector<double>& start_state_vec, double timeout)
 {
 
     std::vector<double> ss_vec;
@@ -242,8 +265,8 @@ std::vector<std::vector<double> > PathPlanner::solve(const std::vector<double>& 
 
     std::vector<std::vector<double> > solution_vector;
     MotionValidator* mv = static_cast<MotionValidator*>(si_->getMotionValidator().get());
-    //boost::shared_ptr<MotionValidator> mv = boost::static_pointer_cast<MotionValidator>(si_->getMotionValidator());
-    /** Add the start state to the problem definition */
+
+    // Add the start state to the problem definition
     if (verbose_) {
         cout << "Adding start state: ";
         for (size_t i = 0; i < dim_; i++) {
@@ -262,7 +285,7 @@ std::vector<std::vector<double> > PathPlanner::solve(const std::vector<double>& 
     if (check_linear_path_) {
         bool collides = false;
         std::vector<double> goal_state_vec;
-        static_cast<shared::GoalRegion*>(goal_region_.get())->sampleGoalVec(goal_state_vec);
+        static_cast<frapu::GoalRegion*>(goal_region_.get())->sampleGoalVec(goal_state_vec);
         std::vector<std::vector<double> > linear_path(genLinearPath(ss_vec, goal_state_vec));
 
         for (size_t i = 1; i < linear_path.size(); i++) {
@@ -283,38 +306,22 @@ std::vector<std::vector<double> > PathPlanner::solve(const std::vector<double>& 
 
     }
 
-    /** Solve the planning problem with a maximum of *timeout* seconds per attempt */
+    // Solve the planning problem with a maximum of *timeout* seconds per attempt
     bool solved = false;
     boost::timer t;
     bool approximate_solution = true;
-
-    /**while (!solved || approximate_solution) {
-        solved = planner_->solve(4.0);
-        //solved = planner_->solve(10.0);
-        if (t.elapsed() > timeout) {
-          cout << "Timeout reached." << endl;
-          return solution_vector;
-        }
-        for (auto &solution : problem_definition_->getSolutions()) {
-
-          cout << "diff " << solution.difference_ << endl;
-          approximate_solution = false;
-
-        }
-    }**/
     solved = solve_(timeout);
     if (!solved) {
-        return solution_vector;
+        VectorTrajectory v;
+        return v;
     }
 
 
     ompl::geometric::PathGeometric* solution_path =
         static_cast<ompl::geometric::PathGeometric*>(problem_definition_->getSolutionPath().get());
 
-    //boost::shared_ptr<ompl::geometric::PathGeometric> solution_path = boost::static_pointer_cast<ompl::geometric::PathGeometric>(problem_definition_->getSolutionPath());
-
     solution_vector.push_back(ss_vec);
-    /** We found a solution, so get the solution path */
+    // We found a solution, so get the solution path
 
     if (verbose_) {
         cout << "Solution found in " << t.elapsed() << " seconds." << endl;
@@ -335,9 +342,9 @@ std::vector<std::vector<double> > PathPlanner::solve(const std::vector<double>& 
     return augmentPath_(solution_vector);
 }
 
-std::vector<std::vector<double>> PathPlanner::augmentPath_(std::vector<std::vector<double>>& solution_path)
+VectorTrajectory StandardPathPlanner::augmentPath_(std::vector<std::vector<double>>& solution_path)
 {
-    std::vector<std::vector<double>> augmented_path;
+    VectorTrajectory vectorTrajectory;
     for (size_t i = 0; i < solution_path.size(); i++) {
         std::vector<double> path_element;
         std::vector<double> solution_element;
@@ -364,27 +371,18 @@ std::vector<std::vector<double>> PathPlanner::augmentPath_(std::vector<std::vect
             observation.push_back(0.0);
         }
 
-        for (size_t j = 0; j < solution_element.size(); j++) {
-            path_element.push_back(solution_element[j]);
-        }
-
-        for (size_t j = 0; j < control.size(); j++) {
-            path_element.push_back(control[j]);
-        }
-
-        for (size_t j = 0; j < observation.size(); j++) {
-            path_element.push_back(observation[j]);
-        }
+        vectorTrajectory.states.push_back(solution_element);
+        vectorTrajectory.observations.push_back(observation);
+        vectorTrajectory.controls.push_back(control);
 
         if (i != solution_path.size() - 1) {
-            path_element.push_back(delta_t_);
+            vectorTrajectory.durations.push_back(delta_t_);
         } else {
-            path_element.push_back(0.0);
+            vectorTrajectory.durations.push_back(0.0);
         }
-
-        augmented_path.push_back(path_element);
     }
-    return augmented_path;
+
+    return vectorTrajectory;
 }
 
 

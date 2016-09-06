@@ -6,40 +6,42 @@
 #include <random>
 #include <boost/python.hpp>
 
-namespace shared {    
+namespace frapu
+{
 
-    class RobotGoalRegion: public shared::GoalRegion {
-        public:
-    	    RobotGoalRegion() = default;
-    	
-            RobotGoalRegion(const ompl::base::SpaceInformationPtr &si,
-            		              std::shared_ptr<shared::RobotEnvironment> &robot_environment,
-                                  std::vector<std::vector<double>> &goal_states);
-            
-            RobotGoalRegion(std::shared_ptr<shared::RobotGoalRegion> &other_goal_region);
-                                  
-                                  
-            //~RobotGoalRegion() = default;
+class RobotGoalRegion: public GoalRegion
+{
+public:
+    RobotGoalRegion() = default;
 
-            virtual double distanceGoal(const ompl::base::State *st) const override;
+    RobotGoalRegion(const ompl::base::SpaceInformationPtr& si,
+                    std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
+                    std::vector<std::vector<double>>& goal_states);
 
-            virtual void sampleGoal(ompl::base::State *st) const override;
-            
-            double getThreshold() const;
-            
-            virtual void sampleGoalVec(std::vector<double> &goal_vec) const override;
+    RobotGoalRegion(std::shared_ptr<frapu::RobotGoalRegion>& other_goal_region);
 
-            virtual unsigned int maxSampleCount() const override;
-            
-            virtual bool isSatisfied(const ompl::base::State *st) const override;    
-	    
 
-        private:
-            double euclideanDistance(const std::vector<double> &vec1, const std::vector<double> &vec2) const;
-            
-            double goal_threshold_;
-            
-    };
+    //~RobotGoalRegion() = default;
+
+    virtual double distanceGoal(const ompl::base::State* st) const override;
+
+    virtual void sampleGoal(ompl::base::State* st) const override;
+
+    double getThreshold() const;
+
+    virtual void sampleGoalVec(std::vector<double>& goal_vec) const override;
+
+    virtual unsigned int maxSampleCount() const override;
+
+    virtual bool isSatisfied(const ompl::base::State* st) const override;
+
+
+private:
+    double euclideanDistance(const std::vector<double>& vec1, const std::vector<double>& vec2) const;
+
+    double goal_threshold_;
+
+};
 
 }
 
