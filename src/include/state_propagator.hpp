@@ -17,13 +17,16 @@ class StatePropagator: public ompl::control::StatePropagator
 {
 public:
     StatePropagator(const ompl::control::SpaceInformationPtr& si,
-                    std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
+                    frapu::SceneSharedPtr& scene,
+                    frapu::RobotSharedPtr& robot,
                     bool& verbose);
 
     void propagate(const ompl::base::State* state,
                    const ompl::control::Control* control,
                    const double duration,
                    ompl::base::State* result) const;
+		   
+    void setSimulationStepSize(double &simulationStepSize);
 
     bool canPropagateBackward() const;
 
@@ -40,12 +43,14 @@ private:
 
     // Determines if the robo model has been set up
     bool model_setup_;
-
+    
+    frapu::SceneSharedPtr& scene_;
+    
     // The robot model
-    std::shared_ptr<frapu::RobotEnvironment> robot_environment_;
+    frapu::RobotSharedPtr& robot_;
 
     // The simulation step size
-    const double simulation_step_size_;
+    double simulation_step_size_;
 
     bool verbose_;
 };

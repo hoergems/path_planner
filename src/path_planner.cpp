@@ -65,28 +65,24 @@ void StandardPathPlanner::setupPlanner(std::string planner_str)
     planner_->setProblemDefinition(problem_definition_);
 }
 
-void StandardPathPlanner::setup(std::shared_ptr<frapu::RobotEnvironment>& robot_environment)
+void StandardPathPlanner::setup(frapu::SceneSharedPtr &scene, frapu::RobotSharedPtr &robot)
 {
-    dim_ = robot_environment->getRobot()->getDOF();
+    dim_ = robot->getDOF();
     space_ = ompl::base::StateSpacePtr(new ompl::base::RealVectorStateSpace(dim_));
     si_ = ompl::base::SpaceInformationPtr(new ompl::base::SpaceInformation(space_));
 
     problem_definition_ = ompl::base::ProblemDefinitionPtr(new ompl::base::ProblemDefinition(si_));
-    motionValidator_ = std::make_shared<frapu::MotionValidator>(si_, continuous_collision_, false);    
-    //motionValidator_ = boost::make_shared<shared::MotionValidator>(si_, continuous_collision_, false);
-    //problem_definition_(new ompl::base::ProblemDefinition(si_))
-    /**motionValidator_(new MotionValidator(si_,
-                                             continuous_collision,
-                                             false))*/
-    static_cast<frapu::MotionValidator*>(motionValidator_.get())->setRobotEnvironment(robot_environment);
+    motionValidator_ = std::make_shared<frapu::MotionValidator>(si_, continuous_collision_, false);
+    static_cast<frapu::MotionValidator*>(motionValidator_.get())->setScene(scene);
+    static_cast<frapu::MotionValidator*>(motionValidator_.get())->setRobot(robot);
     std::vector<double> lowerStateLimits;
     std::vector<double> upperStateLimits;
     ompl::base::RealVectorBounds bounds(dim_);
     frapu::StateLimitsSharedPtr stateLimits =
-        robot_environment->getRobot()->getStateSpace()->getStateLimits();
+        robot->getStateSpace()->getStateLimits();
     static_cast<frapu::VectorStateLimits*>(stateLimits.get())->getVectorLimits(lowerStateLimits, upperStateLimits);
 
-    if (robot_environment->getRobot()->constraintsEnforced()) {
+    if (robot->constraintsEnforced()) {
         for (size_t i = 0; i < dim_; i++) {
             bounds.setLow(i, lowerStateLimits[i]);
             bounds.setHigh(i, upperStateLimits[i]);
@@ -187,6 +183,13 @@ std::vector<std::vector<double> > StandardPathPlanner::genLinearPath(std::vector
 
 void StandardPathPlanner::setGoal(ompl::base::GoalPtr& goalRegion)
 {
+    if (!goalRegion) {
+	cout << "PathPlanner: Given goal region is nullptr!" << endl;
+	assert(false);
+    }
+    else {
+	cout << "Goal region is okay!" << endl;
+    }
     goal_region_ = goalRegion;
 }
 
@@ -233,7 +236,7 @@ bool StandardPathPlanner::solve_(double time_limit)
 TrajectorySharedPtr StandardPathPlanner::solve(const RobotStateSharedPtr& robotState,
         double timeout)
 {
-    TrajectorySharedPtr trajectory;
+    TrajectorySharedPtr trajectory = std::make_shared<frapu::Trajectory>();
     std::vector<double> startStateVec = static_cast<VectorState*>(robotState.get())->asVector();
     VectorTrajectory vectorTrajectory = solve(startStateVec, timeout);
     if (vectorTrajectory.states.size() == 0) {

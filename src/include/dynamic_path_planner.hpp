@@ -31,7 +31,7 @@
 #include "MotionValidator.hpp"
 #include "RobotGoalRegion.hpp"
 #include <robot_environment/robot_environment.hpp>
-#include "trajectory.hpp"
+//#include "trajectory.hpp"
 
 using std::cout;
 using std::endl;
@@ -40,8 +40,8 @@ namespace frapu
 {
 
 ompl::base::GoalPtr makeRobotGoalRegion(const ompl::base::SpaceInformationPtr si,
-                                        std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
-                                        std::vector<std::vector<double>> goal_states);
+                                        frapu::RobotSharedPtr& robot,
+                                        std::vector<frapu::RobotStateSharedPtr> &goalStates);
 
 //typedef ompl::control::PathControlPtr PathControlPtr;
 
@@ -52,37 +52,38 @@ public:
 
     //copy constructor
     DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner>& dynamic_path_planner,
-                       std::shared_ptr<frapu::RobotEnvironment>& robot_environment);
+                       frapu::SceneSharedPtr& scene,
+                       frapu::RobotSharedPtr& robot);
 
     ~DynamicPathPlanner() {
         //cout << "RESET" << endl;
-	planner_->clear();
-	problem_definition_->clearGoal();
-	problem_definition_->clearSolutionPaths();
-	problem_definition_->clearStartStates();
-	motionValidator_.reset();
-	goal_region_.reset();
-	state_space_.reset();
-	control_space_.reset();
-	space_information_.reset();
-	problem_definition_.reset();
-	planner_.reset();
-	state_propagator_.reset();
+        planner_->clear();
+        problem_definition_->clearGoal();
+        problem_definition_->clearSolutionPaths();
+        problem_definition_->clearStartStates();
+        motionValidator_.reset();
+        goal_region_.reset();
+        state_space_.reset();
+        control_space_.reset();
+        space_information_.reset();
+        problem_definition_.reset();
+        planner_.reset();
+        state_propagator_.reset();
     }
-    
+
     void reset() {
-	planner_->clear();
-	//problem_definition_->clearGoal();
-	problem_definition_->clearSolutionPaths();
-	problem_definition_->clearStartStates();	
+        planner_->clear();
+        //problem_definition_->clearGoal();
+        problem_definition_->clearSolutionPaths();
+        problem_definition_->clearStartStates();
     }
 
     bool isValid(const ompl::base::State* state);
 
     bool isValidPy(std::vector<double>& state);
-    
-    virtual TrajectorySharedPtr solve(const RobotStateSharedPtr &robotState, 
-				      double timeout) override;
+
+    virtual TrajectorySharedPtr solve(const RobotStateSharedPtr& robotState,
+                                      double timeout) override;
 
     VectorTrajectory solve(const std::vector<double>& start_state_vec, double timeout);
 
@@ -94,7 +95,8 @@ public:
                               bool continuous_collision);*/
     ompl::base::MotionValidatorPtr getMotionValidator() const;
 
-    bool setup(std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
+    bool setup(frapu::SceneSharedPtr& scene,
+               frapu::RobotSharedPtr& robot,
                std::string planner);
 
     void getAllStates(std::vector<std::vector<double>>& all_states);
@@ -108,8 +110,10 @@ public:
     void setRRTGoalBias(double goal_bias);
 
     void setControlSampler(std::string control_sampler);
-    
+
     void setContinuousCollisionCheck(bool continuous_collision);
+
+    void setSimulationStepSize(double& simulationStepSize);
 
     ompl::base::GoalPtr getGoalRegion() const;
 
@@ -126,6 +130,9 @@ public:
     std::vector<int> min_max_control_duration_;
 
     bool add_intermediate_states_;
+
+    double simulationStepSize_;
+
 private:
     ompl::base::MotionValidatorPtr motionValidator_;
 
@@ -172,7 +179,8 @@ private:
     // Solve the motion planning problem
     bool solve_(double time_limit);
 
-    bool setup_ompl_(std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
+    bool setup_ompl_(frapu::SceneSharedPtr& scene,
+                     frapu::RobotSharedPtr& robot,
                      bool& verbose);
 
     ompl::control::ControlSamplerPtr allocUniformControlSampler_(const ompl::control::ControlSpace* control_space);

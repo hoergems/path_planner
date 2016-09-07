@@ -11,19 +11,25 @@ namespace frapu
 {
 
 ompl::base::GoalPtr makeRobotGoalRegion(const ompl::base::SpaceInformationPtr si,
-                                        std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
-                                        std::vector<std::vector<double>> goal_states)
+                                        frapu::RobotSharedPtr& robot,
+                                        std::vector<frapu::RobotStateSharedPtr> &goalStates)
 {
-    if (goal_states.size() == 0) {
+    if (goalStates.size() == 0) {
         cout << "No goal states provided. In order to generate a goal area, at least one goal state is required." << endl;
         return nullptr;
     }
-    ompl::base::GoalPtr robot_goal_region(new RobotGoalRegion(si, robot_environment, goal_states));
+    
+    std::vector<std::vector<double>> goalStatesVec(goalStates.size());
+    for (size_t i = 0; i < goalStates.size(); i++) {
+	goalStatesVec[i] = static_cast<frapu::VectorState *>(goalStates[i].get())->asVector();
+    }
+    
+    ompl::base::GoalPtr robotGoalRegion(new RobotGoalRegion(si, robot, goalStatesVec));
 
-    if (!robot_goal_region) {
+    if (!robotGoalRegion) {
         cout << "NULLLLPTR!!!!!!!!" << endl;
     }
-    return robot_goal_region;
+    return robotGoalRegion;
 }
 
 
@@ -52,7 +58,8 @@ DynamicPathPlanner::DynamicPathPlanner(bool verbose):
 }
 
 DynamicPathPlanner::DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner>& dynamic_path_planner,
-                                       std::shared_ptr<frapu::RobotEnvironment>& robot_environment):
+                                       frapu::SceneSharedPtr& scene,
+                                       frapu::RobotSharedPtr& robot):
     goal_region_(nullptr),
     state_space_dimension_(0),
     control_space_dimension_(0),
@@ -71,9 +78,10 @@ DynamicPathPlanner::DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner>& dyna
     control_sampler_("discrete"),
     rrt_goal_bias_(0.05),
     min_max_control_duration_(std::vector<int>( {1, 4})),
-                          add_intermediate_states_(true)
+                          add_intermediate_states_(true),
+                          simulationStepSize_(0.0)
 {
-    setup(robot_environment, planner_str_);
+    setup(scene, robot, planner_str_);
     ompl::base::GoalPtr goal_region = dynamic_path_planner->getGoalRegion();
     setGoal(goal_region);
     setNumControlSamples(dynamic_path_planner->num_control_samples_);
@@ -81,6 +89,7 @@ DynamicPathPlanner::DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner>& dyna
     setRRTGoalBias(dynamic_path_planner->rrt_goal_bias_);
     setMinMaxControlDuration(dynamic_path_planner->min_max_control_duration_);
     addIntermediateStates(dynamic_path_planner->add_intermediate_states_);
+    setSimulationStepSize(dynamic_path_planner->simulationStepSize_);
 }
 
 ompl::base::GoalPtr DynamicPathPlanner::getGoalRegion() const
@@ -119,11 +128,12 @@ void DynamicPathPlanner::log_(std::string msg, bool warn = false)
     }
 }
 
-bool DynamicPathPlanner::setup(std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
+bool DynamicPathPlanner::setup(frapu::SceneSharedPtr& scene,
+                               frapu::RobotSharedPtr& robot,
                                std::string planner)
 {
-    state_space_dimension_ = robot_environment->getRobot()->getStateSpace()->getNumDimensions();
-    control_space_dimension_ = robot_environment->getRobot()->getActionSpace()->getNumDimensions();
+    state_space_dimension_ = robot->getStateSpace()->getNumDimensions();
+    control_space_dimension_ = robot->getActionSpace()->getNumDimensions();
     state_space_ = ompl::base::StateSpacePtr(new ompl::base::RealVectorStateSpace(state_space_dimension_));
     control_space_ = ompl::control::ControlSpacePtr(new frapu::ControlSpace(state_space_, control_space_dimension_));
     space_information_ = ompl::control::SpaceInformationPtr(new ompl::control::SpaceInformation(state_space_, control_space_));
@@ -131,7 +141,7 @@ bool DynamicPathPlanner::setup(std::shared_ptr<frapu::RobotEnvironment>& robot_e
     planner_str_ = planner;
     /***** Setup OMPL *****/
     log_("Setting up OMPL");
-    setup_ompl_(robot_environment, verbose_);
+    setup_ompl_(scene, robot, verbose_);
     log_("OMPL setup");
     log_("Setup complete");
     return true;
@@ -179,7 +189,14 @@ void DynamicPathPlanner::setContinuousCollisionCheck(bool continuous_collision)
     static_cast<MotionValidator&>(*motionValidator_).setContinuousCollisionCheck(continuous_collision);
 }
 
-bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
+void DynamicPathPlanner::setSimulationStepSize(double& simulationStepSize)
+{
+    simulationStepSize_ = simulationStepSize;
+    static_cast<frapu::StatePropagator*>(state_propagator_.get())->setSimulationStepSize(simulationStepSize);
+}
+
+bool DynamicPathPlanner::setup_ompl_(frapu::SceneSharedPtr& scene,
+                                     frapu::RobotSharedPtr& robot,
                                      bool& verbose)
 {
     if (!verbose_) {
@@ -190,12 +207,13 @@ bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<frapu::RobotEnvironment>& r
                        continuous_collision,
                        true));
 
-    static_cast<frapu::MotionValidator*>(motionValidator_.get())->setRobotEnvironment(robot_environment);
+    static_cast<frapu::MotionValidator*>(motionValidator_.get())->setScene(scene);
+    static_cast<frapu::MotionValidator*>(motionValidator_.get())->setRobot(robot);
 
     state_space_bounds_ = ompl::base::RealVectorBounds(state_space_dimension_);
     space_information_->setMotionValidator(motionValidator_);
     space_information_->setMinMaxControlDuration(1, 1);
-    space_information_->setPropagationStepSize(robot_environment->getControlDuration());
+    space_information_->setPropagationStepSize(robot->getControlDuration());
 
     problem_definition_ = ompl::base::ProblemDefinitionPtr(new ompl::base::ProblemDefinition(space_information_));
     if (planner_str_ == "EST") {
@@ -207,23 +225,19 @@ bool DynamicPathPlanner::setup_ompl_(std::shared_ptr<frapu::RobotEnvironment>& r
     planner_->setProblemDefinition(problem_definition_);
 
     state_propagator_ = ompl::control::StatePropagatorPtr(new frapu::StatePropagator(space_information_,
-                        robot_environment,
+                        scene,
+                        robot,
                         verbose));
     space_information_->setStatePropagator(state_propagator_);
 
     // Set the bounds
     ompl::base::RealVectorBounds control_bounds(control_space_dimension_);
-
     std::vector<double> lowerStateLimits;
     std::vector<double> upperStateLimits;
     std::vector<double> lowerControlLimits;
     std::vector<double> upperControlLimits;
-
-    std::shared_ptr<frapu::Robot> robot = robot_environment->getRobot();
-
     frapu::StateLimitsSharedPtr stateLimits = robot->getStateSpace()->getStateLimits();
     static_cast<frapu::VectorStateLimits*>(stateLimits.get())->getVectorLimits(lowerStateLimits, upperStateLimits);
-
     frapu::ActionLimitsSharedPtr actionLimits =
         robot->getActionSpace()->getActionLimits();
     static_cast<frapu::VectorActionLimits*>(actionLimits.get())->getRawLimits(lowerControlLimits, upperControlLimits);
@@ -360,40 +374,41 @@ VectorTrajectory DynamicPathPlanner::solve(const std::vector<double>& start_stat
     solved = solve_(timeout);
     if (solved) {
         ompl::base::PlannerSolution planner_solution(problem_definition_->getSolutionPath());
-        ompl::base::PathPtr solution_path_ = planner_solution.path_;	
+        ompl::base::PathPtr solution_path_ = planner_solution.path_;
         std::vector<ompl::base::State*> solution_states_(static_cast<ompl::control::PathControl*>(solution_path_.get())->getStates());
         std::vector<ompl::control::Control*> solution_controls_(static_cast<ompl::control::PathControl*>(solution_path_.get())->getControls());
-        std::vector<double> control_durations(static_cast<ompl::control::PathControl*>(solution_path_.get())->getControlDurations());        
-        for (size_t i = 0; i < solution_states_.size(); i++) {            
+        std::vector<double> control_durations(static_cast<ompl::control::PathControl*>(solution_path_.get())->getControlDurations());
+        for (size_t i = 0; i < solution_states_.size(); i++) {
             std::vector<double> state;
-            std::vector<double> control;	   
-            std::vector<double> observation;	    
-            for (size_t j = 0; j < state_space_dimension_; j++) {		
+            std::vector<double> control;
+            std::vector<double> observation;
+            for (size_t j = 0; j < state_space_dimension_; j++) {
                 state.push_back(solution_states_[i]->as<ompl::base::RealVectorStateSpace::StateType>()->values[j]);
-		observation.push_back(solution_states_[i]->as<ompl::base::RealVectorStateSpace::StateType>()->values[j]);
+                observation.push_back(solution_states_[i]->as<ompl::base::RealVectorStateSpace::StateType>()->values[j]);
             }
-            
+
             vectorTrajectory.states.push_back(state);
-	    vectorTrajectory.observations.push_back(observation);	    
-            
+            vectorTrajectory.observations.push_back(observation);
+
             for (size_t j = 0; j < state_space_dimension_ / 2; j++) {
                 if (i < solution_states_.size() - 1) {
-		    control.push_back(solution_controls_[i]->as<ompl::control::RealVectorControlSpace::ControlType>()->values[j]);
+                    control.push_back(solution_controls_[i]->as<ompl::control::RealVectorControlSpace::ControlType>()->values[j]);
                 } else {
                     control.push_back(0.0);
                 }
-            } 
-            
+            }
+
             vectorTrajectory.controls.push_back(control);
             if (i < solution_states_.size() - 1) {
-		vectorTrajectory.durations.push_back(control_durations[i]);                
+                vectorTrajectory.durations.push_back(control_durations[i]);
             } else {
                 vectorTrajectory.durations.push_back(0.0);
             }
-        }        
+        }
     }
 
     return vectorTrajectory;
 }
 
 }
+

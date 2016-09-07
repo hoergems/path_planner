@@ -10,27 +10,19 @@ namespace frapu
 {
 
 RobotGoalRegion::RobotGoalRegion(const ompl::base::SpaceInformationPtr& si,
-                                 std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
+				 frapu::RobotSharedPtr &robot,
                                  std::vector<std::vector<double>>& goal_states):
-    frapu::GoalRegion(si, robot_environment, goal_states),
+    frapu::GoalRegion(si, goal_states),
+    robot_(robot),
     goal_threshold_(0.0)
-{
-    std::vector<double> goal_area;
-    robot_environment->getGoalArea(goal_area);
+{    
+    std::vector<double> goal_area; 
+    robot->getGoalArea(goal_area);
     setThreshold(goal_area[3]);
     goal_threshold_ = goal_area[3];
     //setThreshold(ee_goal_threshold_);
 }
 
-double RobotGoalRegion::euclideanDistance(const std::vector<double>& vec1, const std::vector<double>& vec2) const
-{
-    double sum = 0.0;
-    for (size_t i = 0; i < vec1.size(); i++) {
-        sum += pow(vec2[i] - vec1[i], 2);
-    }
-
-    return sqrt(sum);
-}
 
 double RobotGoalRegion::distanceGoal(const ompl::base::State* st) const
 {
@@ -41,7 +33,7 @@ double RobotGoalRegion::distanceGoal(const ompl::base::State* st) const
     }
 
     frapu::RobotStateSharedPtr robotState = std::make_shared<frapu::VectorState>(v1);
-    return robot_environment_->getRobot()->distanceGoal(robotState);
+    return robot_->distanceGoal(robotState);
     //return distance;
 }
 
@@ -86,7 +78,7 @@ bool RobotGoalRegion::isSatisfied(const ompl::base::State* st) const
     }
 
     frapu::RobotStateSharedPtr state = std::make_shared<frapu::VectorState>(state_vec);
-    return robot_environment_->getRobot()->isTerminal(state);
+    return robot_->isTerminal(state);
 }
 }
 

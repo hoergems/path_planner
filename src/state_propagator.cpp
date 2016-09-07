@@ -7,13 +7,15 @@ namespace frapu
 {
 
 StatePropagator::StatePropagator(const ompl::control::SpaceInformationPtr& si,
-                                 std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
+                                 frapu::SceneSharedPtr& scene,
+                                 frapu::RobotSharedPtr& robot,
                                  bool& verbose):
     ompl::control::StatePropagator(si),
     space_information_(si),
     model_setup_(false),
-    robot_environment_(robot_environment),
-    simulation_step_size_(robot_environment->getSimulationStepSize()),
+    scene_(scene),
+    robot_(robot),
+    simulation_step_size_(0.0),
     verbose_(verbose)
 {
 
@@ -25,7 +27,7 @@ void StatePropagator::propagate(const ompl::base::State* state,
                                 ompl::base::State* result) const
 {
     unsigned int dim = space_information_->getStateSpace()->getDimension();
-    unsigned int control_dim = robot_environment_->getRobot()->getActionSpace()->getNumDimensions();
+    unsigned int control_dim = robot_->getActionSpace()->getNumDimensions();
     std::vector<double> current_vel;
     if (verbose_) {
         cout << "State: ";
@@ -60,12 +62,12 @@ void StatePropagator::propagate(const ompl::base::State* state,
     double dur = duration;
     double sss = simulation_step_size_;
 
-    robot_environment_->getRobot()->propagateState(currentState,
-            action,
-            controlErrorVec,
-            dur,
-            sss,
-            resultingState);
+    robot_->propagateState(currentState,
+                           action,
+                           controlErrorVec,
+                           dur,
+                           sss,
+                           resultingState);
 
     std::vector<double> resultVec = static_cast<frapu::VectorState*>(resultingState.get())->asVector();
 
@@ -81,6 +83,10 @@ void StatePropagator::propagate(const ompl::base::State* state,
     for (unsigned int i = 0; i < dim; i++) {
         result->as<ompl::base::RealVectorStateSpace::StateType>()->values[i] = resultVec[i];
     }
+}
+
+void StatePropagator::setSimulationStepSize(double &simulationStepSize) {
+    simulation_step_size_ = simulationStepSize;
 }
 
 bool StatePropagator::canPropagateBackward() const

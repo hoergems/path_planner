@@ -15,7 +15,7 @@ public:
     RobotGoalRegion() = default;
 
     RobotGoalRegion(const ompl::base::SpaceInformationPtr& si,
-                    std::shared_ptr<frapu::RobotEnvironment>& robot_environment,
+		    frapu::RobotSharedPtr &robot,
                     std::vector<std::vector<double>>& goal_states);
 
     RobotGoalRegion(std::shared_ptr<frapu::RobotGoalRegion>& other_goal_region);
@@ -37,9 +37,9 @@ public:
 
 
 private:
-    double euclideanDistance(const std::vector<double>& vec1, const std::vector<double>& vec2) const;
-
     double goal_threshold_;
+    
+    frapu::RobotSharedPtr robot_;
 
 };
 

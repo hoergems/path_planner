@@ -27,7 +27,7 @@
 #include <robot_headers/robot.hpp>
 #include <boost/timer.hpp>
 #include <frapu_core/core.hpp>
-#include "trajectory.hpp"
+//#include "trajectory.hpp"
 
 #include <iostream>
 
@@ -64,7 +64,7 @@ public:
     void setupPlanner(std::string planner_string);
 
     /** Setup OMPL. This need to be called before solving the motion planning problem*/
-    void setup(std::shared_ptr<frapu::RobotEnvironment>& robot_environment);
+    void setup(frapu::SceneSharedPtr &scene, frapu::RobotSharedPtr &robot);
 
     void setGoal(ompl::base::GoalPtr& goalRegion);
 
