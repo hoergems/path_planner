@@ -16,13 +16,12 @@ RobotGoalRegion::RobotGoalRegion(const ompl::base::SpaceInformationPtr& si,
     robot_(robot),
     goal_threshold_(0.0)
 {    
-    std::vector<double> goal_area; 
-    robot->getGoalArea(goal_area);
-    setThreshold(goal_area[3]);
-    goal_threshold_ = goal_area[3];
-    //setThreshold(ee_goal_threshold_);
+    std::vector<double> goalArea;
+    frapu::GoalSharedPtr goal = robot->getGoal();
+    static_cast<frapu::SphereGoal *>(goal.get())->getGoalArea(goalArea);
+    setThreshold(goalArea[3]);
+    goal_threshold_ = goalArea[3];
 }
-
 
 double RobotGoalRegion::distanceGoal(const ompl::base::State* st) const
 {
