@@ -98,7 +98,7 @@ void StandardPathPlanner::setup(frapu::SceneSharedPtr &scene, frapu::RobotShared
     space_->as<ompl::base::RealVectorStateSpace>()->setBounds(bounds);
 
     /** Set the StateValidityChecker */
-    si_->setStateValidityChecker(boost::bind(&StandardPathPlanner::isValid, this, _1));
+    si_->setStateValidityChecker(std::bind(&StandardPathPlanner::isValid, this, std::placeholders::_1));
 
     /** Set the MotionValidation */
     si_->setMotionValidator(motionValidator_);
@@ -315,6 +315,7 @@ VectorTrajectory StandardPathPlanner::solve(const std::vector<double>& start_sta
     bool approximate_solution = true;
     solved = solve_(timeout);
     if (!solved) {
+	cout << "PathPlanner: Warning: solve_ returned an empty trajectory" << endl;
         VectorTrajectory v;
         return v;
     }

@@ -198,7 +198,7 @@ void MotionValidator::setIgnoreUnobservableObstacles(bool ignore_unobservable_ob
     ignore_unobservable_obstacles_ = ignore_unobservable_obstacles;
 }
 
-void MotionValidator::makeCollisionReport(std::shared_ptr<frapu::CollisionReport>& collisionReport)
+void MotionValidator::makeCollisionReport(std::shared_ptr<frapu::CollisionReport>& collisionReport) const
 {
     std::vector<frapu::CollisionObjectSharedPtr> collision_objects_goal;
     robot_->createRobotCollisionObjects(collisionReport->state2, collision_objects_goal);

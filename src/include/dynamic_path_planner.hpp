@@ -4,8 +4,6 @@
 #include <boost/timer.hpp>
 #include <boost/thread.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/python.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "PlanningSpaceInformation.hpp"
 #include "state_propagator.hpp"
 #include "GoalRegion.hpp"

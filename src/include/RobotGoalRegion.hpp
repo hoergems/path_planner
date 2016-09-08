@@ -4,7 +4,6 @@
 #include <robot_environment/robot_environment.hpp>
 #include <iostream>
 #include <random>
-#include <boost/python.hpp>
 
 namespace frapu
 {

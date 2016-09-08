@@ -1,6 +1,5 @@
 #ifndef PATH_PLANNER_HPP_
 #define PATH_PLANNER_HPP_
-#include <boost/python.hpp>
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/spaces/RealVectorBounds.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>

@@ -24,7 +24,7 @@ if(PKG_CONFIG_FOUND)
 endif()
 
 ############################# LOAD BOOST #############################
-find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS python system thread timer)
+find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS system thread timer)
 if (NOT Boost_FOUND)
     set(Boost_INCLUDE_DIRS "${BOOST_INCLUDE_DIRS}")
     IF ( NOT Boost_INCLUDE_DIRS )
@@ -108,8 +108,7 @@ add_library(path_planner SHARED
             ${CMAKE_CURRENT_SOURCE_DIR}/src/DirectedControlSampler.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/EST_control.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/PlanningSpaceInformation.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/rrt_control.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/python_binds.cpp)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/rrt_control.cpp)
             
 target_link_libraries (path_planner
                        ${Boost_LIBRARIES}

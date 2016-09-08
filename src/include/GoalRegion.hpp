@@ -1,6 +1,5 @@
 #ifndef _GOAL_REGION_HPP_
 #define _GOAL_REGION_HPP_
-#include <boost/python.hpp>
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/State.h>
@@ -39,7 +38,7 @@ protected:
 
 };
 
-struct GoalRegionWrapper: GoalRegion, boost::python::wrapper<GoalRegion> {
+/**struct GoalRegionWrapper: GoalRegion, boost::python::wrapper<GoalRegion> {
 public:
     GoalRegionWrapper(const ompl::base::SpaceInformationPtr& si,                      
                       std::vector<std::vector<double>>& goal_states):
@@ -65,7 +64,7 @@ public:
     bool isSatisfied(const ompl::base::State* st) const {
         return this->isSatisfied(st);
     }
-};
+};*/
 
 }
 

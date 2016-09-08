@@ -1,6 +1,5 @@
 #ifndef MAN_MOTION_VALIDATOR_HPP_
 #define MAN_MOTION_VALIDATOR_HPP_
-
 #include <ompl/base/MotionValidator.h>
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/State.h>
@@ -9,39 +8,12 @@
 #include <robot_environment/Obstacle.hpp>
 #include <iostream>
 #include <mutex>
+#include <frapu_core/core.hpp>
 
 namespace frapu
 {
-    
-class CollisionReport {
-public:
-    CollisionReport() {
-	
-    }
-    
-    // Continuous collision check
-    bool continuousCollisionCheck = false;
-    
-    // Ignore unobservable obstacles when doing collision checking
-    bool ignoreUnobservableObstacles = false;
-    
-    // Did we collide?
-    bool collides = false;
-    
-    // The previous state
-    frapu::RobotStateSharedPtr state1;
 
-    // The next state
-    frapu::RobotStateSharedPtr state2;
-
-    // The obstacle we collided with
-    std::string collidingObstacle;
-
-    // Did we collide with an traversable obstacle?
-    bool obstacleTraversable = false;    
-};
-
-class MotionValidator: public ompl::base::MotionValidator
+class MotionValidator: public frapu::CollisionChecker, public ompl::base::MotionValidator
 {
 public:
     MotionValidator(const ompl::base::SpaceInformationPtr& si,
@@ -84,7 +56,7 @@ public:
     
     void setRobot(frapu::RobotSharedPtr &robot);    
     
-    void makeCollisionReport(std::shared_ptr<frapu::CollisionReport> &collisionReport);
+    void makeCollisionReport(frapu::CollisionReportSharedPtr &collisionReport) const override;
 
 private:
     const ompl::base::SpaceInformationPtr si_;
