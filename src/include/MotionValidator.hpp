@@ -4,11 +4,11 @@
 #include <ompl/base/SpaceInformation.h>
 #include <ompl/base/State.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <robot_environment/robot_environment.hpp>
-#include <robot_environment/Obstacle.hpp>
 #include <iostream>
 #include <mutex>
 #include <frapu_core/core.hpp>
+#include <robot_headers/RobotState.hpp>
+#include <robot_headers/robot.hpp>
 
 namespace frapu
 {

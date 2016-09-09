@@ -9,7 +9,8 @@
 #include <ompl/control/StatePropagator.h>
 #include <ompl/base/State.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <robot_environment/robot_environment.hpp>
+#include <frapu_core/core.hpp>
+#include <robot_headers/robot.hpp>
 
 namespace frapu
 {

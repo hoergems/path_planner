@@ -7,8 +7,8 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/samplers/UniformValidStateSampler.h>
 #include <ompl/util/RandomNumbers.h>
-#include <robot_environment/robot_environment.hpp>
 #include <frapu_core/core.hpp>
+#include <robot_headers/robot.hpp>
 
 namespace frapu
 {

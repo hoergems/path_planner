@@ -105,8 +105,7 @@ void StandardPathPlanner::setup(frapu::SceneSharedPtr &scene, frapu::RobotShared
 }
 
 ompl::base::MotionValidatorPtr StandardPathPlanner::getMotionValidator()
-{
-    assert(motionValidator_ && "MotionValidator in path planner is null!!!");
+{    
     return motionValidator_;
 }
 

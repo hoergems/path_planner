@@ -28,7 +28,6 @@
 #include <ompl/base/MotionValidator.h>
 #include "MotionValidator.hpp"
 #include "RobotGoalRegion.hpp"
-#include <robot_environment/robot_environment.hpp>
 //#include "trajectory.hpp"
 
 using std::cout;

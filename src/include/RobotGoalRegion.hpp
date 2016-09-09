@@ -1,7 +1,6 @@
 #ifndef ROBOT_GOAL_REGION_HPP_
 #define ROBOT_GOAL_REGION_HPP_
 #include "GoalRegion.hpp"
-#include <robot_environment/robot_environment.hpp>
 #include <iostream>
 #include <random>
 
