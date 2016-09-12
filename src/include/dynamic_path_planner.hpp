@@ -80,9 +80,7 @@ public:
     bool isValidPy(std::vector<double>& state);
 
     virtual TrajectorySharedPtr solve(const RobotStateSharedPtr& robotState,
-                                      double timeout) override;
-
-    VectorTrajectory solve(const std::vector<double>& start_state_vec, double timeout);
+                                      double timeout) override;    
 
     ompl::base::SpaceInformationPtr getSpaceInformation();
 
@@ -172,6 +170,8 @@ private:
     std::vector<double> ee_goal_position_;
 
     double ee_goal_threshold_;
+    
+    VectorTrajectory solve(const std::vector<double>& start_state_vec, double timeout);
 
     // Solve the motion planning problem
     bool solve_(double time_limit);

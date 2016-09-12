@@ -38,6 +38,8 @@ public:
     bool isValid(const ompl::base::State* state) const;
 
     bool isValid(const std::vector<double>& s1, bool debug = false) const;
+    
+    bool isValid(const frapu::RobotStateSharedPtr &state) const;
 
     void setContinuousCollisionCheck(bool continuous_collision_check);
     

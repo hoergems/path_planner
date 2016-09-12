@@ -109,6 +109,11 @@ bool MotionValidator::isValid(const std::vector<double>& s1, bool debug) const
     return true;
 }
 
+bool MotionValidator::isValid(const frapu::RobotStateSharedPtr &state) const {
+    std::vector<double> stateVec = static_cast<frapu::VectorState *>(state.get())->asVector();
+    return isValid(stateVec, false);
+}
+
 bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
 {
     std::vector<double> state_vec;
