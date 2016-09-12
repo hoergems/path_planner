@@ -31,8 +31,9 @@ double RobotGoalRegion::distanceGoal(const ompl::base::State* st) const
         v1.push_back(v[i]);
     }
 
-    frapu::RobotStateSharedPtr robotState = std::make_shared<frapu::VectorState>(v1);
-    return robot_->distanceGoal(robotState);
+    frapu::RobotStateSharedPtr robotState = std::make_shared<frapu::VectorState>(v1);    
+    double distance = robot_->distanceGoal(robotState);    
+    return distance;
     //return distance;
 }
 

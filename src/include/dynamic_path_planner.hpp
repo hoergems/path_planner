@@ -48,11 +48,11 @@ public:
     DynamicPathPlanner(bool verbose);
 
     //copy constructor
-    DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner>& dynamic_path_planner,
+    /**DynamicPathPlanner(std::shared_ptr<DynamicPathPlanner>& dynamic_path_planner,
                        frapu::SceneSharedPtr& scene,
-                       frapu::RobotSharedPtr& robot);
+                       frapu::RobotSharedPtr& robot);*/
 
-    ~DynamicPathPlanner() {
+    /**~DynamicPathPlanner() {
         //cout << "RESET" << endl;
         planner_->clear();
         problem_definition_->clearGoal();
@@ -65,8 +65,8 @@ public:
         space_information_.reset();
         problem_definition_.reset();
         planner_.reset();
-        state_propagator_.reset();
-    }
+        //static_cast<frapu::StatePropagator*>(space_information_->getStatePropagator().get())->reset();
+    }*/
 
     void reset() {
         planner_->clear();
@@ -162,9 +162,9 @@ private:
 
     // The planner
     ompl::base::PlannerPtr planner_;
-
-    ompl::control::StatePropagatorPtr state_propagator_;
-
+    
+    frapu::RobotSharedPtr robot_;
+    
     std::vector<std::vector<double>> goal_states_;
 
     std::vector<double> ee_goal_position_;

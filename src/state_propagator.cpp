@@ -18,7 +18,7 @@ StatePropagator::StatePropagator(const ompl::control::SpaceInformationPtr& si,
     simulation_step_size_(0.0),
     verbose_(verbose)
 {
-
+    
 }
 
 void StatePropagator::propagate(const ompl::base::State* state,
@@ -26,6 +26,8 @@ void StatePropagator::propagate(const ompl::base::State* state,
                                 const double duration,
                                 ompl::base::State* result) const
 {
+   
+	
     unsigned int dim = space_information_->getStateSpace()->getDimension();
     unsigned int control_dim = robot_->getActionSpace()->getNumDimensions();
     std::vector<double> current_vel;

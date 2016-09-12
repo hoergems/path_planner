@@ -37,7 +37,7 @@ public:
                double& /*duration*/) const;
 
     bool canSteer() const;
-
+    
 private:
     // The OMPL spacei information associated with this state propagator
     const ompl::control::SpaceInformationPtr space_information_;
