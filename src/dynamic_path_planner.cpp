@@ -309,8 +309,7 @@ bool DynamicPathPlanner::solve_(double time_limit)
                 break;
             }
         }
-        if (t0.elapsed() > time_limit) {
-	    frapu::LOGGING("DynamicPathPlanner: solve: timeout reached");
+        if (t0.elapsed() > time_limit) {	    
             return false;
         }
         // Check if there's an exact solution
@@ -329,8 +328,7 @@ TrajectorySharedPtr DynamicPathPlanner::solve(const RobotStateSharedPtr& robotSt
     TrajectorySharedPtr trajectory(new frapu::Trajectory());
     std::vector<double> startStateVec = static_cast<VectorState*>(robotState.get())->asVector();
     VectorTrajectory vectorTrajectory = solve(startStateVec, timeout);
-    if (vectorTrajectory.states.size() == 0) {
-	frapu::LOGGING("DynamicPathPlanner: solve: trajectory has size 0");
+    if (vectorTrajectory.states.size() == 0) {	
         return trajectory;
     }
     trajectory->stateTrajectory = std::vector<RobotStateSharedPtr>(vectorTrajectory.states.size());
