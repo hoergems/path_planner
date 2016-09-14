@@ -15,6 +15,7 @@ StandardPathPlanner::StandardPathPlanner(double delta_t,
     PathPlanner(),
     goal_region_(nullptr),
     dim_(0),
+    stateSpaceDimension_(0),
     delta_t_(delta_t),
     continuous_collision_(continuous_collision),
     max_joint_velocity_(max_joint_velocity),
@@ -68,6 +69,8 @@ void StandardPathPlanner::setupPlanner(std::string planner_str)
 void StandardPathPlanner::setup(frapu::SceneSharedPtr &scene, frapu::RobotSharedPtr &robot)
 {
     dim_ = robot->getDOF();
+    stateSpaceDimension_ = robot->getStateSpace()->getNumDimensions();
+    
     space_ = ompl::base::StateSpacePtr(new ompl::base::RealVectorStateSpace(dim_));
     si_ = ompl::base::SpaceInformationPtr(new ompl::base::SpaceInformation(space_));
 
@@ -237,6 +240,9 @@ TrajectorySharedPtr StandardPathPlanner::solve(const RobotStateSharedPtr& robotS
 {
     TrajectorySharedPtr trajectory = std::make_shared<frapu::Trajectory>();
     std::vector<double> startStateVec = static_cast<VectorState*>(robotState.get())->asVector();
+    if (startStateVec.size() > 4) {
+	frapu::ERROR("State larger 4 path planner!");
+    }
     VectorTrajectory vectorTrajectory = solve(startStateVec, timeout);
     if (vectorTrajectory.states.size() == 0) {
         return nullptr;
@@ -369,7 +375,7 @@ VectorTrajectory StandardPathPlanner::augmentPath_(std::vector<std::vector<doubl
           control.push_back(0.0);
         }*/
 
-        for (size_t j = 0; j < dim_; j++) {
+        for (size_t j = 0; j < stateSpaceDimension_ - dim_; j++) {
             solution_element.push_back(0.0);
             observation.push_back(0.0);
         }

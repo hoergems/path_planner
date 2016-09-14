@@ -180,7 +180,7 @@ private:
                      frapu::RobotSharedPtr& robot,
                      bool& verbose);
 
-    ompl::control::ControlSamplerPtr allocUniformControlSampler_(const ompl::control::ControlSpace* control_space);
+    //ompl::control::ControlSamplerPtr allocUniformControlSampler_(const ompl::control::ControlSpace* control_space);
 
     void log_(std::string msg, bool warn);
 

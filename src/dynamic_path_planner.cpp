@@ -135,7 +135,8 @@ bool DynamicPathPlanner::setup(frapu::SceneSharedPtr& scene,
     state_space_dimension_ = robot->getStateSpace()->getNumDimensions();
     control_space_dimension_ = robot->getActionSpace()->getNumDimensions();
     state_space_ = ompl::base::StateSpacePtr(new ompl::base::RealVectorStateSpace(state_space_dimension_));
-    control_space_ = ompl::control::ControlSpacePtr(new frapu::ControlSpace(state_space_, control_space_dimension_));
+    frapu::ActionSpaceSharedPtr actionSpace = robot->getActionSpace();
+    control_space_ = ompl::control::ControlSpacePtr(new frapu::ControlSpace(state_space_, actionSpace, control_space_dimension_));
     space_information_ = ompl::control::SpaceInformationPtr(new ompl::control::SpaceInformation(state_space_, control_space_));
 
     planner_str_ = planner;
@@ -145,12 +146,6 @@ bool DynamicPathPlanner::setup(frapu::SceneSharedPtr& scene,
     log_("OMPL setup");
     log_("Setup complete");
     return true;
-}
-
-ompl::control::ControlSamplerPtr DynamicPathPlanner::allocUniformControlSampler_(const ompl::control::ControlSpace* control_space)
-{
-    return nullptr;
-    return ompl::control::ControlSamplerPtr(new UniformControlSampler(control_space));
 }
 
 void DynamicPathPlanner::setNumControlSamples(unsigned int num_control_samples)

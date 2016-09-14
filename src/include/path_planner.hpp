@@ -78,6 +78,8 @@ private:
 
     /** The dimension of the space we're planning in */
     int dim_;
+    
+    unsigned int stateSpaceDimension_;
 
     /** The maximum allowed euclidean distance between two connected nodes */
     double delta_t_;

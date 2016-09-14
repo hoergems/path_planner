@@ -7,24 +7,29 @@
 #include <ompl/util/RandomNumbers.h>
 #include "control_sampler.hpp"
 
-namespace frapu {
+namespace frapu
+{
 
-    class ControlSpace : public ompl::control::RealVectorControlSpace
-    {
-        public:
-            ControlSpace(const ompl::base::StateSpacePtr &stateSpace, unsigned int dim);
-            
-            ompl::control::ControlSamplerPtr allocDefaultControlSampler() const;
-            
-            void setControlSampler(std::string control_sampler);
-            
-        private:
-            unsigned int dim_;
-            
-            ompl::RNG rng_;
-            
-            std::string control_sampler_;
-    };
+class ControlSpace : public ompl::control::RealVectorControlSpace
+{
+public:
+    ControlSpace(const ompl::base::StateSpacePtr& stateSpace,
+		 frapu::ActionSpaceSharedPtr &actionSpace,
+		 unsigned int dim);
+
+    ompl::control::ControlSamplerPtr allocDefaultControlSampler() const;
+
+    void setControlSampler(std::string control_sampler);
+
+private:
+    frapu::ActionSpaceSharedPtr actionSpace_;
+    
+    unsigned int dim_;
+
+    ompl::RNG rng_;
+
+    std::string control_sampler_;
+};
 
 }
 
