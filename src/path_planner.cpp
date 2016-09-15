@@ -239,10 +239,7 @@ TrajectorySharedPtr StandardPathPlanner::solve(const RobotStateSharedPtr& robotS
         double timeout)
 {
     TrajectorySharedPtr trajectory = std::make_shared<frapu::Trajectory>();
-    std::vector<double> startStateVec = static_cast<VectorState*>(robotState.get())->asVector();
-    if (startStateVec.size() > 4) {
-	frapu::ERROR("State larger 4 path planner!");
-    }
+    std::vector<double> startStateVec = static_cast<VectorState*>(robotState.get())->asVector();    
     VectorTrajectory vectorTrajectory = solve(startStateVec, timeout);
     if (vectorTrajectory.states.size() == 0) {
         return nullptr;
