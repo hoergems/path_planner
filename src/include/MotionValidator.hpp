@@ -59,6 +59,8 @@ public:
     void setRobot(frapu::RobotSharedPtr &robot);    
     
     void makeCollisionReport(frapu::CollisionReportSharedPtr &collisionReport) const override;
+    
+    //frapu::SceneSharedPtr getScene() const;
 
 private:
     const ompl::base::SpaceInformationPtr si_;

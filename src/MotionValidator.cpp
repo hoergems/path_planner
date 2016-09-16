@@ -120,7 +120,7 @@ bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
     for (size_t i = 0; i < dim_; i++) {
         state_vec.push_back(state[i]);
     }
-
+    
     frapu::RobotStateSharedPtr robotState = std::make_shared<frapu::VectorState>(state_vec);
     std::vector<frapu::CollisionObjectSharedPtr> collision_objects;
     robot_->createRobotCollisionObjects(robotState, collision_objects);
@@ -133,7 +133,7 @@ bool MotionValidator::collidesDiscrete(const std::vector<double>& state) const
     }
 
     for (size_t i = 0; i < obstacles.size(); i++) {
-        if (!obstacles[i]->getTerrain()->isTraversable()) {
+        if (!obstacles[i]->getTerrain()->isTraversable()) {            
             if (obstacles[i]->inCollision(collision_objects)) {
                 return true;
             }
@@ -182,6 +182,10 @@ bool MotionValidator::inSelfCollision(const std::vector<double>& state) const
 void MotionValidator::setScene(frapu::SceneSharedPtr &scene) {
     scene_ = scene;
 }
+
+/**frapu::SceneSharedPtr MotionValidator::getScene() const {
+    return scene_;
+}*/
     
 void MotionValidator::setRobot(frapu::RobotSharedPtr &robot) {
     robot_ = robot;
